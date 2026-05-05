@@ -41,8 +41,9 @@
   body{
     font-family:var(--font-main);
     background:#fff;
-    width:min(1024px,100vw);
-    height:min(768px,100vh);
+    width:100vw;
+    height:100vh;
+    height:100dvh;
     overflow:hidden;
     display:flex;
     position:relative;
@@ -411,7 +412,8 @@
     border-radius:0;
     position:absolute;
     top:50%;left:50%;
-    transform:translate(-50%,-50%);
+    transform:translate(-50%,-50%) scale(var(--meal-scale, 1));
+    transform-origin:center;
     overflow:hidden;
     touch-action:none;
   }
@@ -563,26 +565,31 @@
   /* food slots on tray */
   .food-slot{
     position:absolute;
+    left:0;
+    top:0;
     z-index:8;
     display:flex;align-items:center;justify-content:center;
     width:80px;height:80px;
     font-size:52px;
     filter:drop-shadow(2px 4px 6px rgba(0,0,0,.3));
-    transition:opacity .3s cubic-bezier(.34,1.56,.64,1), transform .3s cubic-bezier(.34,1.56,.64,1);
+    --slot-x:0px;
+    --slot-y:0px;
+    --slot-scale:1;
+    transition:opacity .25s cubic-bezier(.34,1.56,.64,1), filter .2s;
     cursor:grab;
     user-select:none;
     -webkit-user-select:none;
     -webkit-touch-callout:none;
     -webkit-tap-highlight-color:transparent;
     touch-action:none;
-    will-change:left,top;
-    transform:translateZ(0);
+    will-change:transform;
+    transform:translate3d(var(--slot-x), var(--slot-y), 0) scale(var(--slot-scale));
     backface-visibility:hidden;
   }
   .food-slot.dragging{
     cursor:grabbing;
     transition:none;
-    filter:drop-shadow(2px 4px 6px rgba(0,0,0,.3));
+    filter:none;
   }
   .food-slot img{
     pointer-events:none;
@@ -591,8 +598,8 @@
     -webkit-user-drag:none;
     -webkit-touch-callout:none;
   }
-  .food-slot.empty{opacity:0;transform:scale(0);}
-  .food-slot.filled{opacity:1;transform:scale(1);}
+  .food-slot.empty{opacity:0;--slot-scale:0;}
+  .food-slot.filled{opacity:1;--slot-scale:1;}
   .name-sticker-slot{
     width:148px;
     height:42px;
@@ -644,7 +651,8 @@
     display:none;
     position:fixed;
     left:0;top:0;
-    width:1024px;height:768px;
+    width:100vw;height:100vh;
+    height:100dvh;
     z-index:100;
     align-items:center;justify-content:center;
     flex-direction:column;
@@ -738,6 +746,12 @@
     opacity:0;
     animation:fadeIn .4s .8s forwards;
     text-shadow:0 2px 4px rgba(0,0,0,.3);
+    min-height:22px;
+    transition:color .2s, transform .2s;
+  }
+  #overlay-hint.success{
+    color:#fff;
+    transform:scale(1.04);
   }
   @keyframes fadeIn{to{opacity:1;}}
 
@@ -780,6 +794,10 @@
   #overlay-save:disabled{
     opacity:.65;
     cursor:wait;
+  }
+  #overlay-save.saved{
+    background:var(--orange);
+    color:#fff;
   }
   #overlay-save:active,
   #overlay-close:active{transform:scale(.96);}
@@ -1263,6 +1281,8 @@ const saveScale = 3;
 const nameLabel = { right: 155, bottom: 62, width: 102, fontSize: 16, lineHeight: 19 };
 const dragBounds = { left: 48, top: 48, right: 48, bottom: 54 };
 const stickerDir = '素材/貼紙/';
+const mealBaseSize = { width: 560, height: 448, trayHeight: 393 };
+let mealScale = 1;
 
 resetSlotLayout();
 
@@ -1337,6 +1357,9 @@ const preloadAssets = [
   '素材/背景/13.png','素材/背景/14.png','素材/背景/15.png','素材/背景/16.png'
 ];
 preloadAssets.forEach(preloadImage);
+updateResponsiveScale();
+window.addEventListener('resize', updateResponsiveScale);
+window.addEventListener('orientationchange', updateResponsiveScale);
 
 // ── NAV ──
 const noScrollCats = ['set', 'main', 'veg', 'fruit', 'dessert', 'drink'];
@@ -1461,8 +1484,8 @@ function resetSlotLayout() {
 function applySlotLayout(type) {
   const slot = document.getElementById(slotId(type));
   const pos = state.positions[type] || slotDefaults[type];
-  slot.style.left = `${pos.x}px`;
-  slot.style.top = `${pos.y}px`;
+  slot.style.setProperty('--slot-x', `${pos.x}px`);
+  slot.style.setProperty('--slot-y', `${pos.y}px`);
   slot.style.zIndex = state.z[type] || 8;
 }
 
@@ -1487,9 +1510,7 @@ function startDragFood(e, type) {
   if (!state[type]) return;
   e.preventDefault();
 
-  const tray = document.getElementById('tray');
   const slot = document.getElementById(slotId(type));
-  const trayRect = tray.getBoundingClientRect();
   const pos = state.positions[type];
   const startX = e.clientX;
   const startY = e.clientY;
@@ -1501,10 +1522,10 @@ function startDragFood(e, type) {
   slot.setPointerCapture(e.pointerId);
 
   const moveFood = moveEvent => {
-    const nextX = originX + moveEvent.clientX - startX;
-    const nextY = originY + moveEvent.clientY - startY;
-    const maxX = trayRect.width - dragBounds.right - slot.offsetWidth;
-    const maxY = trayRect.height - dragBounds.bottom - slot.offsetHeight;
+    const nextX = originX + (moveEvent.clientX - startX) / mealScale;
+    const nextY = originY + (moveEvent.clientY - startY) / mealScale;
+    const maxX = mealBaseSize.width - dragBounds.right - slot.offsetWidth;
+    const maxY = mealBaseSize.trayHeight - dragBounds.bottom - slot.offsetHeight;
     state.positions[type] = {
       x: clamp(nextX, dragBounds.left, maxX),
       y: clamp(nextY, dragBounds.top, maxY)
@@ -1532,6 +1553,21 @@ function clamp(value, min, max) {
 
 function slotId(type) {
   return type === 'nameSticker' ? 'slot-name-sticker' : `slot-${type}`;
+}
+
+function updateResponsiveScale() {
+  const stage = document.getElementById('stage');
+  const mealCard = document.getElementById('meal-card');
+  if (!stage || !mealCard) return;
+
+  const stageRect = stage.getBoundingClientRect();
+  const usableW = Math.max(280, stageRect.width - 48);
+  const usableH = Math.max(260, stageRect.height - 108);
+  mealScale = Math.min(1, usableW / mealBaseSize.width, usableH / mealBaseSize.height);
+
+  document.documentElement.style.setProperty('--meal-scale', mealScale);
+  mealCard.style.width = `${mealBaseSize.width * mealScale}px`;
+  mealCard.style.height = `${mealBaseSize.height * mealScale}px`;
 }
 
 function finalSlotId(type) {
@@ -1654,7 +1690,9 @@ async function saveCardNow() {
     }
   } finally {
     saveButton.disabled = false;
-    saveButton.textContent = '儲存圖片';
+    if (!saveButton.classList.contains('saved')) {
+      saveButton.textContent = '儲存圖片';
+    }
   }
 }
 
@@ -1713,8 +1751,17 @@ async function renderSaveCanvas() {
 
 function showSaveFeedback(message = '套餐卡已儲存！') {
   const hint = document.getElementById('overlay-hint');
+  const button = document.getElementById('overlay-save');
   hint.textContent = message;
-  setTimeout(() => { hint.textContent = saveHintDefault; }, 2000);
+  hint.classList.add('success');
+  button.classList.add('saved');
+  button.textContent = '已儲存';
+  setTimeout(() => {
+    hint.textContent = saveHintDefault;
+    hint.classList.remove('success');
+    button.classList.remove('saved');
+    button.textContent = '儲存圖片';
+  }, 2400);
 }
 
 function loadCanvasImage(src) {
