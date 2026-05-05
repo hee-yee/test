@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monster Nightshift – 寂凸怪早餐</title>
+<style>
+  @font-face{
+    font-family:'Mantou Sans';
+    src:url('素材/MantouSans-main/Font/MantouSans-Regular.ttf') format('truetype');
+    font-weight:400;
+    font-style:normal;
+    font-display:swap;
+  }
+  @font-face{
+    font-family:'LINE Seed TW';
+    src:url('素材/LINE Seed TW_ver02/WOFF2/LINESeedTW_OTF_Bd.woff2') format('woff2');
+    font-weight:700;
+    font-style:normal;
+    font-display:swap;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+  }
+
+  :root{
+    --orange:#FFC56E;
+    --dark-orange:#F5B24F;
+    --bg-dark:#2a2a2a;
+    --card-bg:#ffffff;
+    --sidebar-w:62px;
+    --menu-w:296px;
+    --font-main:'Mantou Sans','饅頭黑體',sans-serif;
+    --font-body:'LINE Seed TW','PingFang TC','Microsoft JhengHei',sans-serif;
+  }
+
+  body{
+    font-family:var(--font-main);
+    background:#fff;
+    width:min(1024px,100vw);
+    height:min(768px,100vh);
+    overflow:hidden;
+    display:flex;
+    position:relative;
+  }
+
+  /* ── LEFT SIDEBAR ── */
+  #sidebar{
+    width:var(--sidebar-w);
+    height:100%;
+    background:var(--orange);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:46px 0 0;
+    gap:28px;
+    z-index:10;
+    flex-shrink:0;
+  }
+  #sidebar .logo{
+    width:46px;height:46px;
+    background:transparent;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:34px;
+    font-size:20px;
+  }
+  #sidebar .logo img{width:46px;height:46px;display:block;object-fit:contain;}
+  .nav-btn{
+    width:48px;height:30px;
+    background:transparent;
+    border:3px solid #fff;
+    border-radius:10px;
+    color:#fff;
+    font-family:var(--font-main);
+    font-size:15px;
+    font-weight:400;
+    letter-spacing:.2em;
+    text-indent:.2em;
+    cursor:pointer;
+    transition:background .2s,transform .1s;
+    display:flex;align-items:center;justify-content:center;
+    line-height:1;
+  }
+  .nav-btn:hover{background:rgba(255,255,255,0.18);}
+  .nav-btn.active{background:#fff;color:var(--orange);}
+
+  /* ── MENU PANEL ── */
+  #menu-panel{
+    width:var(--menu-w);
+    height:100%;
+    background:#fff;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:44px 10px 34px 22px;
+    flex-shrink:0;
+    border-right:2px solid #f0f0f0;
+  }
+  #menu-panel::-webkit-scrollbar{width:4px;}
+  #menu-panel::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px;}
+  #menu-panel.no-scroll{
+    overflow-y:hidden;
+    padding-top:22px;
+    padding-bottom:18px;
+  }
+
+  .menu-category{display:none;}
+  .menu-category.active{display:block;}
+  #cat-veg.active,
+  #cat-fruit.active,
+  #cat-dessert.active,
+  #cat-drink.active{
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:46px;
+  }
+
+  .category-title{
+    display:none;
+    font-size:30px;font-weight:400;
+    color:var(--orange);
+    margin-bottom:0;
+    text-shadow:0 4px 8px rgba(255,197,110,.38);
+  }
+
+  .item-card{
+    background:#fff;
+    border-radius:20px;
+    padding:18px 14px 18px 12px;
+    width:100%;
+    margin:0 0 56px 0;
+    display:grid;
+    grid-template-columns:76px minmax(0,1fr);
+    grid-template-rows:auto auto;
+    align-items:center;
+    column-gap:12px;
+    row-gap:12px;
+    min-height:140px;
+    position:relative;
+    box-shadow:0 8px 26px rgba(0,0,0,0.10);
+    cursor:pointer;
+    transition:transform .15s,box-shadow .15s;
+  }
+  .item-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.12);}
+
+  .item-img{
+    width:72px;height:68px;
+    object-fit:contain;
+    flex-shrink:0;
+    font-size:48px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:8px;
+    grid-column:1;
+    grid-row:1 / 3;
+  }
+  .item-img img,
+  .food-slot img,
+  .name-sticker-slot img,
+  .final-food img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+  }
+  .item-img img{transform-origin:center;}
+
+  .item-info{
+    grid-column:2;
+    grid-row:1;
+    align-self:end;
+  }
+  .item-card[data-type="veg"] .item-info,
+  .item-card[data-type="fruit"] .item-info,
+  .item-card[data-type="dessert"] .item-info,
+  .item-card[data-type="drink"] .item-info{
+    margin-left:12px;
+  }
+  .item-name{
+    position:absolute;
+    left:8px;
+    top:-36px;
+    font-size:20px;
+    font-weight:400;
+    color:var(--orange);
+    margin-bottom:0;
+    text-shadow:0 4px 8px rgba(255,197,110,.38);
+    white-space:nowrap;
+    letter-spacing:.1em;
+  }
+  .item-card[data-type="veg"] .item-name,
+  .item-card[data-type="fruit"] .item-name,
+  .item-card[data-type="dessert"] .item-name,
+  .item-card[data-type="drink"] .item-name{
+    text-shadow:0 2px 1px rgba(0,0,0,.10);
+  }
+  .item-name.title-img{
+    top:-42px;
+    left:4px;
+    height:47px;
+    display:flex;
+    align-items:center;
+  }
+  .item-name.title-img img{
+    width:auto;
+    height:100%;
+    max-width:270px;
+    object-fit:contain;
+    object-position:left center;
+    display:block;
+  }
+  .item-name.title-main img{max-width:256px;}
+  .item-card[data-id="set1"] .item-name.title-img img,
+  .item-card[data-id="set2"] .item-name.title-img img{
+    max-width:270px;
+  }
+  .item-card[data-id="set3"] .item-name.title-img img,
+  .item-card[data-id="set4"] .item-name.title-img img{
+    height:41px;
+    max-width:246px;
+  }
+  .item-card[data-id="main1"] .item-name.title-img img,
+  .item-card[data-id="main2"] .item-name.title-img img{
+    max-width:256px;
+  }
+  .item-card[data-id="main3"] .item-name.title-img img,
+  .item-card[data-id="main4"] .item-name.title-img img{
+    height:36px;
+    max-width:210px;
+  }
+  .item-card[data-id="veg3"] .item-name.title-img img,
+  .item-card[data-id="veg4"] .item-name.title-img img,
+  .item-card[data-id="fruit3"] .item-name.title-img img,
+  .item-card[data-id="fruit4"] .item-name.title-img img,
+  .item-card[data-id="drk3"] .item-name.title-img img,
+  .item-card[data-id="drk4"] .item-name.title-img img{
+    height:35px;
+    max-width:215px;
+  }
+  .item-card[data-id="des3"] .item-name.title-img img,
+  .item-card[data-id="des4"] .item-name.title-img img{
+    height:34px;
+    max-width:210px;
+  }
+  .item-sub{
+    font-family:var(--font-body);
+    font-size:12px;
+    font-weight:700;
+    color:var(--orange);
+    margin-bottom:0;
+    line-height:1.65;
+    letter-spacing:.04em;
+  }
+  .item-accessories{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;}
+  .item-accessories span{font-size:18px;}
+  .item-accessories img{width:18px;height:18px;object-fit:contain;}
+  .item-card[data-type="set"],
+  .item-card[data-type="main"]{
+    grid-template-columns:116px minmax(0,1fr);
+    grid-template-rows:1fr auto;
+    column-gap:10px;
+    row-gap:6px;
+    padding:14px 12px 14px 12px;
+  }
+  .item-card[data-type="set"] .item-info,
+  .item-card[data-type="main"] .item-info{
+    align-self:end;
+  }
+  .item-card[data-type="set"] .item-sub,
+  .item-card[data-type="main"] .item-sub{
+    font-size:9px;
+    line-height:1.45;
+  }
+  .item-card[data-type="set"] .add-btn,
+  .item-card[data-type="main"] .add-btn{
+    margin-left:0;
+    padding:8px 14px;
+    font-size:14px;
+    border-radius:11px;
+  }
+  .item-card[data-type="set"] .item-img,
+  .item-card[data-type="main"] .item-img{
+    width:110px;
+    height:86px;
+  }
+  .item-card[data-type="veg"] .item-img,
+  .item-card[data-type="fruit"] .item-img,
+  .item-card[data-type="dessert"] .item-img,
+  .item-card[data-type="drink"] .item-img{width:72px;height:68px;}
+  .item-card[data-type="set"],
+  .item-card[data-type="main"],
+  .item-card[data-type="veg"],
+  .item-card[data-type="fruit"],
+  .item-card[data-type="dessert"],
+  .item-card[data-type="drink"]{
+    width:261px;
+    min-height:0;
+    height:122px;
+  }
+  .item-card[data-type="set"],
+  .item-card[data-type="main"]{
+    margin:50px 0 8px 0;
+  }
+  .item-card[data-type="veg"],
+  .item-card[data-type="fruit"],
+  .item-card[data-type="dessert"],
+  .item-card[data-type="drink"]{
+    margin:0;
+  }
+  .item-card[data-id="veg1"] .item-img img,
+  .item-card[data-id="veg3"] .item-img img,
+  .item-card[data-id="fruit1"] .item-img img,
+  .item-card[data-id="fruit2"] .item-img img,
+  .item-card[data-id="fruit3"] .item-img img,
+  .item-card[data-id="fruit4"] .item-img img{transform:scale(.78);}
+  .item-card[data-id="veg2"] .item-img img{transform:scale(1.16);}
+  .item-card[data-type="set"] .item-accessories{display:none;}
+  .item-card[data-type="bg"]{
+    padding:0;
+    min-height:190px;
+    margin:0;
+    width:100%;
+    overflow:hidden;
+    border-radius:20px;
+    display:block;
+  }
+  .item-card[data-type="bg"] .item-img{grid-column:auto;grid-row:auto;}
+  .item-card[data-type="bg"] .item-img{
+    width:100%;
+    height:100%;
+    min-height:190px;
+    border-radius:0;
+  }
+  .item-card[data-type="bg"] .item-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .item-card[data-type="bg"] .item-info,
+  .item-card[data-type="bg"] .add-btn{display:none;}
+  .bg-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:32px 18px;
+  }
+  #cat-bg .category-title{display:none;}
+
+  .add-btn{
+    background:var(--orange);
+    color:#fff;
+    border:none;
+    border-radius:13px;
+    padding:11px 16px;
+    font-family:var(--font-main);
+    font-size:16px;
+    font-weight:400;
+    letter-spacing:.05em;
+    cursor:pointer;
+    transition:background .15s,transform .1s;
+    white-space:nowrap;
+    grid-column:2;
+    grid-row:2;
+    justify-self:start;
+    align-self:start;
+    margin-left:10px;
+  }
+  .add-btn:hover{background:var(--dark-orange);}
+  .add-btn:active{transform:scale(0.95);}
+
+  /* ── RIGHT STAGE ── */
+  #stage{
+    flex:1;
+    height:100%;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background-color:var(--orange);
+    background-image:none;
+    background-size:cover;
+    background-position:center;
+    transition:background .4s;
+  }
+
+  /* star pattern */
+  #stage::before{
+    content:'';
+    position:absolute;inset:0;
+    background-image:radial-gradient(circle, rgba(0,0,0,0.12) 1px, transparent 1px);
+    background-size:48px 48px;
+    pointer-events:none;
+    opacity:.5;
+  }
+
+  /* ── MEAL CARD (tray) ── */
+  #meal-card{
+    width:560px;height:448px;
+    position:relative;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* image-based meal card */
+  #tray{
+    width:560px;height:393px;
+    background:url('素材/小卡.png') center/contain no-repeat;
+    border-radius:0;
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    overflow:hidden;
+    touch-action:none;
+  }
+
+  /* orange sunburst inner */
+  #tray-inner{
+    width:480px;height:380px;
+    background:var(--orange);
+    border-radius:50%;
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    overflow:hidden;
+  }
+  /* sunburst rays */
+  #tray-inner::before{
+    content:'';
+    position:absolute;inset:-50%;
+    background:repeating-conic-gradient(rgba(255,255,255,.18) 0deg 10deg, transparent 10deg 20deg);
+  }
+
+  #tray-inner,
+  .tray-logo,
+  .tray-nightshift,
+  .tray-sale,
+  .tray-product-name,
+  .tray-workday,
+  .tray-nutrition,
+  .tray-toast{
+    display:none !important;
+  }
+
+  /* MONSTER logo */
+  .tray-logo{
+    position:absolute;top:18px;left:60px;
+    font-size:28px;font-weight:900;
+    color:#fff;
+    letter-spacing:2px;
+    text-shadow:3px 3px 0 rgba(0,0,0,.4);
+    z-index:5;
+    font-family:var(--font-main);
+  }
+  .tray-logo span{color:var(--orange);}
+
+  /* NIGHTSHIFT badge */
+  .tray-nightshift{
+    position:absolute;top:16px;right:50px;
+    background:#fff;
+    padding:4px 12px;
+    border-radius:6px;
+    font-size:11px;font-weight:700;
+    color:#333;
+    z-index:5;
+    display:flex;align-items:center;gap:4px;
+  }
+
+  /* SALE sticker */
+  .tray-sale{
+    position:absolute;
+    left:46px;top:50%;
+    transform:translateY(-50%);
+    background:#fff;
+    border-radius:8px;
+    padding:6px 10px;
+    text-align:center;
+    z-index:5;
+    line-height:1.2;
+  }
+  .tray-sale .s1{font-size:12px;font-weight:900;color:#333;}
+  .tray-sale .s2{font-size:22px;font-weight:900;color:#333;}
+  .tray-sale .s3{font-size:10px;color:#333;}
+
+  /* Chinese product name */
+  .tray-product-name{
+    position:absolute;
+    top:68px;left:50%;
+    transform:translateX(-50%);
+    background:var(--orange);
+    color:#fff;
+    font-size:15px;font-weight:900;
+    padding:4px 14px;
+    border-radius:6px;
+    z-index:6;
+    white-space:nowrap;
+    border:2px solid #fff;
+    text-shadow:1px 1px 0 rgba(0,0,0,.3);
+  }
+
+  /* WORKDAY LIST */
+  .tray-workday{
+    position:absolute;
+    left:46px;bottom:90px;
+    background:#fff;
+    border-radius:6px;
+    padding:6px 10px;
+    font-size:9px;
+    color:#333;
+    z-index:5;
+    line-height:1.8;
+  }
+  .tray-workday b{display:block;font-size:10px;font-weight:700;margin-bottom:2px;}
+
+  /* BREAKFAST label */
+  .tray-breakfast{
+    position:absolute;
+    right:155px;bottom:62px;
+    transform:rotate(-4deg);
+    display:flex;align-items:center;gap:8px;
+    z-index:9;
+  }
+  .tray-breakfast .b-label,
+  .tray-breakfast .b-hash{display:none;}
+  .tray-breakfast .b-label{
+    background:#222;color:#fff;
+    font-size:14px;font-weight:900;
+    letter-spacing:2px;
+    padding:5px 16px;border-radius:6px;
+  }
+  .tray-breakfast .b-name{
+    background:transparent;
+    border-radius:0;
+    padding:0;
+    min-width:102px;
+    font-size:13px;font-weight:700;color:#999;
+  }
+  .tray-breakfast .b-name input{
+    border:none;outline:none;
+    font-family:var(--font-main);
+    font-size:16px;font-weight:400;
+    color:#333;
+    width:102px;
+    text-align:center;
+    background:transparent;
+    letter-spacing:.06em;
+  }
+  .tray-breakfast .b-hash{
+    background:#222;color:#fff;
+    font-size:14px;font-weight:900;
+    padding:5px 10px;border-radius:6px;
+  }
+
+  /* toast icon */
+  .tray-toast{
+    position:absolute;
+    bottom:55px;left:calc(50% - 140px);
+    font-size:18px;z-index:5;
+  }
+
+  /* food slots on tray */
+  .food-slot{
+    position:absolute;
+    z-index:8;
+    display:flex;align-items:center;justify-content:center;
+    width:80px;height:80px;
+    font-size:52px;
+    filter:drop-shadow(2px 4px 6px rgba(0,0,0,.3));
+    transition:opacity .3s cubic-bezier(.34,1.56,.64,1), transform .3s cubic-bezier(.34,1.56,.64,1);
+    cursor:grab;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:none;
+    will-change:left,top;
+    transform:translateZ(0);
+    backface-visibility:hidden;
+  }
+  .food-slot.dragging{
+    cursor:grabbing;
+    transition:none;
+    filter:drop-shadow(2px 4px 6px rgba(0,0,0,.3));
+  }
+  .food-slot img{
+    pointer-events:none;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-user-drag:none;
+    -webkit-touch-callout:none;
+  }
+  .food-slot.empty{opacity:0;transform:scale(0);}
+  .food-slot.filled{opacity:1;transform:scale(1);}
+  .name-sticker-slot{
+    width:148px;
+    height:42px;
+  }
+
+  /* slot positions */
+  #slot-main{width:170px;height:128px;font-size:98px;}
+  #slot-veg{font-size:46px;width:72px;height:72px;}
+  #slot-fruit{font-size:46px;width:70px;height:70px;}
+  #slot-dessert{font-size:46px;width:69px;height:69px;}
+  #slot-drink{font-size:46px;width:67px;height:67px;}
+  #slot-name-sticker{width:160px;height:45px;}
+
+  /* nutrition label (right side of tray) */
+  .tray-nutrition{
+    position:absolute;right:28px;top:50%;
+    transform:translateY(-50%);
+    background:rgba(255,255,255,.9);
+    width:60px;
+    border-radius:4px;
+    padding:4px;
+    font-size:7px;color:#333;
+    z-index:5;
+    line-height:1.5;
+  }
+  .tray-nutrition .nn{font-weight:900;font-size:8px;}
+
+  /* COMPLETE BUTTON */
+  #complete-btn{
+    position:absolute;
+    bottom:20px;right:24px;
+    background:#fff;
+    color:var(--orange);
+    border:3px solid var(--orange);
+    border-radius:14px;
+    padding:10px 24px;
+    font-family:var(--font-main);
+    font-size:18px;font-weight:400;
+    cursor:pointer;
+    z-index:20;
+    transition:all .2s;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+  }
+  #complete-btn:hover{background:var(--orange);color:#fff;transform:translateY(-2px);}
+  #complete-btn:active{transform:scale(0.95);}
+
+  /* ── COMPLETION OVERLAY ── */
+  #overlay{
+    display:none;
+    position:fixed;
+    left:0;top:0;
+    width:1024px;height:768px;
+    z-index:100;
+    align-items:center;justify-content:center;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  #overlay.show{display:flex;}
+
+  #overlay-bg{
+    position:absolute;inset:0;
+    background:var(--orange);
+    opacity:.95;
+    transition:background .4s;
+  }
+
+  #anim-card{
+    position:relative;z-index:2;
+    transform:scale(0);
+    animation:popOut .6s cubic-bezier(.34,1.56,.64,1) forwards;
+    cursor:pointer;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+  }
+  #anim-card img,
+  #anim-card .final-food,
+  #final-card{
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+  }
+  #anim-card img{pointer-events:none;}
+  @keyframes popOut{
+    0%{transform:scale(0) rotate(-5deg);}
+    100%{transform:scale(1) rotate(0deg);}
+  }
+
+  #anim-card .final-card{
+    background:url('素材/小卡.png') center/contain no-repeat;
+    border-radius:0;
+    width:560px;height:393px;
+    position:relative;
+    overflow:visible;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:none;
+  }
+
+  .final-inner{
+    width:400px;height:320px;
+    background:var(--orange);
+    border-radius:50%;
+    position:absolute;
+    overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .final-inner::before{
+    content:'';position:absolute;inset:-50%;
+    background:repeating-conic-gradient(rgba(255,255,255,.18) 0deg 10deg, transparent 10deg 20deg);
+  }
+  .final-inner{display:none;}
+
+  .final-food{
+    position:absolute;
+    font-size:70px;z-index:3;
+    filter:drop-shadow(2px 4px 8px rgba(0,0,0,.3));
+  }
+  #ff-name-sticker{width:160px;height:45px;}
+  #ff-main{width:170px;height:128px;}
+  #ff-veg{width:72px;height:72px;}
+  #ff-fruit{width:70px;height:70px;}
+  #ff-dessert{width:69px;height:69px;}
+  #ff-drink{width:67px;height:67px;}
+  #ff-name{
+    position:absolute;
+    right:155px;bottom:62px;
+    width:102px;
+    transform:rotate(-4deg);
+    color:#333;
+    font-size:16px;
+    font-weight:400;
+    text-align:center;
+    letter-spacing:.06em;
+    z-index:4;
+  }
+
+  #overlay-hint{
+    position:relative;z-index:2;
+    color:#fff;
+    font-size:15px;font-weight:400;
+    letter-spacing:.06em;
+    margin-top:16px;
+    opacity:0;
+    animation:fadeIn .4s .8s forwards;
+    text-shadow:0 2px 4px rgba(0,0,0,.3);
+  }
+  @keyframes fadeIn{to{opacity:1;}}
+
+  #overlay-close{
+    position:relative;z-index:2;
+    background:rgba(255,255,255,.25);
+    border:2px solid #fff;
+    color:#fff;
+    font-family:var(--font-main);
+    font-size:15px;font-weight:400;
+    letter-spacing:.06em;
+    padding:8px 24px;
+    border-radius:10px;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+    text-shadow:0 2px 4px rgba(0,0,0,.3);
+    transition:background .2s, transform .2s, box-shadow .2s;
+  }
+  #overlay-close:hover{background:rgba(255,255,255,.4);box-shadow:0 6px 16px rgba(0,0,0,.18);}
+  #overlay-actions{
+    position:relative;z-index:2;
+    display:flex;
+    gap:12px;
+    margin-top:12px;
+    opacity:0;
+    animation:fadeIn .4s 1s forwards;
+  }
+  #overlay-save{
+    background:#fff;
+    border:2px solid #fff;
+    color:var(--orange);
+    font-family:var(--font-main);
+    font-size:15px;font-weight:400;
+    letter-spacing:.06em;
+    padding:8px 24px;
+    border-radius:10px;
+    cursor:pointer;
+  }
+  #overlay-save:hover{background:var(--orange);color:#fff;}
+  #overlay-save:disabled{
+    opacity:.65;
+    cursor:wait;
+  }
+  #overlay-save:active,
+  #overlay-close:active{transform:scale(.96);}
+
+  /* save canvas (hidden) */
+  #save-canvas{display:none;}
+
+  /* confetti */
+  .confetti-piece{
+    position:absolute;
+    width:10px;height:10px;
+    opacity:0;
+    animation:confettiFall 1.5s ease-in forwards;
+    z-index:1;
+    pointer-events:none;
+  }
+  @keyframes confettiFall{
+    0%{transform:translateY(-100px) rotate(0deg);opacity:1;}
+    100%{transform:translateY(600px) rotate(720deg);opacity:0;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<div id="sidebar">
+  <div class="logo"><img src="素材/icon.png" alt="Moonster icon"></div>
+  <button class="nav-btn active" data-cat="set">套餐</button>
+  <button class="nav-btn" data-cat="main">主餐</button>
+  <button class="nav-btn" data-cat="veg">蔬菜</button>
+  <button class="nav-btn" data-cat="fruit">水果</button>
+  <button class="nav-btn" data-cat="dessert">甜點</button>
+  <button class="nav-btn" data-cat="drink">飲料</button>
+  <button class="nav-btn" data-cat="bg">背景</button>
+</div>
+
+<!-- ── MENU PANEL ── -->
+<div id="menu-panel" class="no-scroll">
+
+  <!-- 套餐 -->
+  <div class="menu-category active" id="cat-set">
+    <div class="category-title">套餐</div>
+
+    <div class="item-card" data-type="set" data-id="set1">
+      <div class="item-img"><img src="素材/Oset.png" alt="寂凸怪蛋吐司套餐" width="116" height="96"></div>
+      <div class="item-info">
+        <div class="item-name title-img title-set"><img src="素材/標題名/套餐1.png" alt="01 寂凸怪蛋吐司套餐"></div>
+        <div class="item-sub">主餐：寂凸怪蛋吐司<br>副餐：柳橙／南瓜／香蕉布丁／花草茶</div>
+        <div class="item-accessories">
+          <img src="素材/O2.png" alt="柳橙">
+          <img src="素材/O1.png" alt="南瓜">
+          <img src="素材/O3.png" alt="香蕉布丁">
+          <img src="素材/O4.png" alt="花草茶">
+        </div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="set" data-id="set2">
+      <div class="item-img"><img src="素材/Pset.png" alt="睏飽寶漢堡包套餐" width="116" height="96"></div>
+      <div class="item-info">
+        <div class="item-name title-img title-set"><img src="素材/標題名/套餐2.png" alt="02 睏飽寶漢堡包套餐"></div>
+        <div class="item-sub">主餐：睏飽寶漢堡包<br>副餐：櫻桃／甜菜根／能量飲／草莓優格</div>
+        <div class="item-accessories">
+          <img src="素材/P2.png" alt="櫻桃">
+          <img src="素材/P1.png" alt="甜菜根">
+          <img src="素材/P4.png" alt="能量飲">
+          <img src="素材/P3.png" alt="草莓優格">
+        </div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="set" data-id="set3">
+      <div class="item-img"><img src="素材/Bset.png" alt="夜魔瞎肉夾饃套餐" width="116" height="96"></div>
+      <div class="item-info">
+        <div class="item-name title-img title-set"><img src="素材/標題名/套餐3.png" alt="03 夜魔瞎肉夾饃套餐"></div>
+        <div class="item-sub">主餐：夜魔瞎肉夾饃<br>副餐：藍莓／茄子／蝶豆花凍／桑椹果醋</div>
+        <div class="item-accessories">
+          <img src="素材/B2.png" alt="藍莓">
+          <img src="素材/B1.png" alt="茄子">
+          <img src="素材/B3.png" alt="蝶豆花凍">
+          <img src="素材/B4.png" alt="桑椹果醋">
+        </div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="set" data-id="set4">
+      <div class="item-img"><img src="素材/Gset.png" alt="小燒貨大燒餅套餐" width="116" height="96"></div>
+      <div class="item-info">
+        <div class="item-name title-img title-set"><img src="素材/標題名/套餐4.png" alt="04 小燒貨大燒餅套餐"></div>
+        <div class="item-sub">主餐：小燒貨大燒餅<br>副餐：奇異果／苦瓜／綠豆湯／蘆薈汁</div>
+        <div class="item-accessories">
+          <img src="素材/G2.png" alt="奇異果">
+          <img src="素材/G1.png" alt="苦瓜">
+          <img src="素材/G3.png" alt="綠豆湯">
+          <img src="素材/G4.png" alt="蘆薈汁">
+        </div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+  </div>
+
+  <!-- 主餐 -->
+  <div class="menu-category" id="cat-main">
+    <div class="category-title">主餐</div>
+
+    <div class="item-card" data-type="main" data-id="main1" data-img="素材/O.png" data-alt="寂凸怪蛋吐司">
+      <div class="item-img"><img src="素材/O.png" alt="寂凸怪蛋吐司" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img title-main"><img src="素材/標題名/主餐1.png" alt="01 寂凸怪蛋吐司"></div>
+        <div class="item-sub">打擊損害心靈的寂凸怪，讓夜班帶來的孤獨，在進食瞬間得到緩解。</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="main" data-id="main2" data-img="素材/P.png" data-alt="睏飽寶漢堡包">
+      <div class="item-img"><img src="素材/P.png" alt="睏飽寶漢堡包" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img title-main"><img src="素材/標題名/主餐2.png" alt="02 睏飽寶漢堡包"></div>
+        <div class="item-sub">控制導致作息失衡、體力透支的睏飽寶，修復長期累積的慢性疲勞。</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="main" data-id="main3" data-img="素材/B.png" data-alt="夜魔瞎肉夾饃">
+      <div class="item-img"><img src="素材/B.png" alt="夜魔瞎肉夾饃" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img title-main"><img src="素材/標題名/主餐3.png" alt="03 夜魔瞎肉夾饃"></div>
+        <div class="item-sub">攻擊針對視線不佳、突發風險的夜魔瞎，為昏暗的夜間路況帶來一絲曙光。</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="main" data-id="main4" data-img="素材/G.png" data-alt="小燒貨大燒餅">
+      <div class="item-img"><img src="素材/G.png" alt="小燒貨大燒餅" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img title-main"><img src="素材/標題名/主餐4.png" alt="04 小燒貨大燒餅"></div>
+        <div class="item-sub">收服面對醉酒鬧事等無法預測的小燒貨，讓緊繃的狀態得以平復。</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+  </div>
+
+  <!-- 蔬菜 -->
+  <div class="menu-category" id="cat-veg">
+    <div class="category-title">蔬菜</div>
+
+    <div class="item-card" data-type="veg" data-id="veg1" data-img="素材/O1.png" data-alt="南瓜">
+      <div class="item-img"><img src="素材/O1.png" alt="南瓜" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/蔬菜1.png" alt="01 南瓜"></div>
+        <div class="item-sub">穩定血壓、舒緩憂鬱</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="veg" data-id="veg2" data-img="素材/P1.png" data-alt="甜菜根">
+      <div class="item-img"><img src="素材/P1.png" alt="甜菜根" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/蔬菜2.png" alt="02 甜菜根"></div>
+        <div class="item-sub">修復肝臟、促進循環</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="veg" data-id="veg3" data-img="素材/B1.png" data-alt="茄子">
+      <div class="item-img"><img src="素材/B1.png" alt="茄子" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/蔬菜3.png" alt="03 茄子"></div>
+        <div class="item-sub">保護血管、預防病變</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="veg" data-id="veg4" data-img="素材/G1.png" data-alt="苦瓜">
+      <div class="item-img"><img src="素材/G1.png" alt="苦瓜" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/蔬菜4.png" alt="04 苦瓜"></div>
+        <div class="item-sub">清熱退火、調節血糖</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+  </div>
+
+  <!-- 水果 -->
+  <div class="menu-category" id="cat-fruit">
+    <div class="category-title">水果</div>
+
+    <div class="item-card" data-type="fruit" data-id="fruit1" data-img="素材/O2.png" data-alt="柳橙">
+      <div class="item-img"><img src="素材/O2.png" alt="柳橙" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/水果1.png" alt="01 柳橙"></div>
+        <div class="item-sub">抑制壓力、提升免疫</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="fruit" data-id="fruit2" data-img="素材/P2.png" data-alt="櫻桃">
+      <div class="item-img"><img src="素材/P2.png" alt="櫻桃" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/水果2.png" alt="02 櫻桃"></div>
+        <div class="item-sub">調節生理時鐘、維護腸胃</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="fruit" data-id="fruit3" data-img="素材/B2.png" data-alt="藍莓">
+      <div class="item-img"><img src="素材/B2.png" alt="藍莓" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/水果3.png" alt="03 藍莓"></div>
+        <div class="item-sub">修復視網膜、護眼球</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="fruit" data-id="fruit4" data-img="素材/G2.png" data-alt="奇異果">
+      <div class="item-img"><img src="素材/G2.png" alt="奇異果" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/水果4.png" alt="04 奇異果"></div>
+        <div class="item-sub">穩定神經、排解怒氣</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+  </div>
+
+  <!-- 甜點 -->
+  <div class="menu-category" id="cat-dessert">
+    <div class="category-title">甜點</div>
+
+    <div class="item-card" data-type="dessert" data-id="des1" data-img="素材/O3.png" data-alt="香蕉布丁">
+      <div class="item-img"><img src="素材/O3.png" alt="香蕉布丁" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/甜點1.png" alt="01 香蕉布丁"></div>
+        <div class="item-sub">合成血清素、更快樂</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="dessert" data-id="des2" data-img="素材/P3.png" data-alt="草莓優格">
+      <div class="item-img"><img src="素材/P3.png" alt="草莓優格" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/甜點2.png" alt="02 草莓優格"></div>
+        <div class="item-sub">輕盈飽足、不傷腸胃</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="dessert" data-id="des3" data-img="素材/B3.png" data-alt="蝶豆花凍">
+      <div class="item-img"><img src="素材/B3.png" alt="蝶豆花凍" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/甜點3.png" alt="03 蝶豆花凍"></div>
+        <div class="item-sub">抗氧化、抗藍光傷害</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="dessert" data-id="des4" data-img="素材/G3.png" data-alt="綠豆湯">
+      <div class="item-img"><img src="素材/G3.png" alt="綠豆湯" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/甜點4.png" alt="04 綠豆湯"></div>
+        <div class="item-sub">消暑解毒、排解燥熱</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+  </div>
+
+  <!-- 飲料 -->
+  <div class="menu-category" id="cat-drink">
+    <div class="category-title">飲料</div>
+
+    <div class="item-card" data-type="drink" data-id="drk1" data-img="素材/O4.png" data-alt="花草茶">
+      <div class="item-img"><img src="素材/O4.png" alt="花草茶" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/飲料1.png" alt="01 花草茶"></div>
+        <div class="item-sub">安神助眠、緩解焦慮</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="drink" data-id="drk2" data-img="素材/P4.png" data-alt="能量飲">
+      <div class="item-img"><img src="素材/P4.png" alt="能量飲" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/飲料2.png" alt="02 能量飲"></div>
+        <div class="item-sub">消除疲勞、提升專注</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="drink" data-id="drk3" data-img="素材/B4.png" data-alt="桑椹果醋">
+      <div class="item-img"><img src="素材/B4.png" alt="桑椹果醋" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/飲料3.png" alt="03 桑椹果醋"></div>
+        <div class="item-sub">改善循環、緩解疲勞</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+
+    <div class="item-card" data-type="drink" data-id="drk4" data-img="素材/G4.png" data-alt="蘆薈汁">
+      <div class="item-img"><img src="素材/G4.png" alt="蘆薈汁" width="80" height="80"></div>
+      <div class="item-info">
+        <div class="item-name title-img"><img src="素材/副餐名/飲料4.png" alt="04 蘆薈汁"></div>
+        <div class="item-sub">迅速降火、利尿排毒</div>
+      </div>
+      <button class="add-btn">加入購物車</button>
+    </div>
+  </div>
+
+  <!-- 背景 -->
+  <div class="menu-category" id="cat-bg">
+    <div class="category-title">背景</div>
+    <div class="bg-grid">
+      <div class="item-card" data-type="bg" data-id="bg01" data-img="素材/背景/01.png">
+        <div class="item-img"><img src="素材/背景/01.png" alt="背景 01"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg02" data-img="素材/背景/02.png?v=20260505">
+        <div class="item-img"><img src="素材/背景/02.png?v=20260505" alt="背景 02"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg03" data-img="素材/背景/03.png">
+        <div class="item-img"><img src="素材/背景/03.png" alt="背景 03"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg04" data-img="素材/背景/04.png?v=20260505">
+        <div class="item-img"><img src="素材/背景/04.png?v=20260505" alt="背景 04"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg05" data-img="素材/背景/05.png">
+        <div class="item-img"><img src="素材/背景/05.png" alt="背景 05"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg06" data-img="素材/背景/06.png">
+        <div class="item-img"><img src="素材/背景/06.png" alt="背景 06"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg07" data-img="素材/背景/07.png">
+        <div class="item-img"><img src="素材/背景/07.png" alt="背景 07"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg08" data-img="素材/背景/08.png">
+        <div class="item-img"><img src="素材/背景/08.png" alt="背景 08"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg09" data-img="素材/背景/09.png">
+        <div class="item-img"><img src="素材/背景/09.png" alt="背景 09"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg10" data-img="素材/背景/10.png">
+        <div class="item-img"><img src="素材/背景/10.png" alt="背景 10"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg11" data-img="素材/背景/11.png">
+        <div class="item-img"><img src="素材/背景/11.png" alt="背景 11"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg12" data-img="素材/背景/12.png">
+        <div class="item-img"><img src="素材/背景/12.png" alt="背景 12"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg13" data-img="素材/背景/13.png">
+        <div class="item-img"><img src="素材/背景/13.png" alt="背景 13"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg14" data-img="素材/背景/14.png">
+        <div class="item-img"><img src="素材/背景/14.png" alt="背景 14"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg15" data-img="素材/背景/15.png">
+        <div class="item-img"><img src="素材/背景/15.png" alt="背景 15"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+      <div class="item-card" data-type="bg" data-id="bg16" data-img="素材/背景/16.png">
+        <div class="item-img"><img src="素材/背景/16.png" alt="背景 16"></div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── RIGHT STAGE ── -->
+<div id="stage">
+
+  <!-- MEAL CARD -->
+  <div id="meal-card">
+    <div id="tray">
+      <div id="tray-inner"></div>
+
+      <!-- decorative labels -->
+      <div class="tray-logo">M<span>🐱</span>NSTER</div>
+      <div class="tray-nightshift">🍞 NIGHTSHIFT</div>
+
+      <div class="tray-sale">
+        <div class="s1">SALE!</div>
+        <div class="s2">30%</div>
+        <div class="s3">OFF</div>
+      </div>
+
+      <div class="tray-product-name" id="product-name">寂凸怪蛋吐司</div>
+
+      <div class="tray-workday">
+        <b>WORKDAY LIST</b>
+        ☐ STAY ALIVE<br>
+        ☐ GET BREAKFAST<br>
+        ☐ GO TO SLEEP
+      </div>
+
+      <div class="tray-nutrition">
+        <div class="nn">營養成分?</div>
+        每份含量<br>熱量: --<br>蛋白質: --<br>脂肪: --<br>碳水: --<br>鈉: --mg
+      </div>
+
+      <!-- Food slots -->
+      <div class="food-slot empty" id="slot-main"></div>
+      <div class="food-slot empty" id="slot-veg"></div>
+      <div class="food-slot empty" id="slot-fruit"></div>
+      <div class="food-slot empty" id="slot-dessert"></div>
+      <div class="food-slot empty" id="slot-drink"></div>
+      <div class="food-slot name-sticker-slot empty" id="slot-name-sticker"></div>
+
+      <div class="tray-toast">🍞</div>
+      <div class="tray-breakfast">
+        <div class="b-label">BREAKFAST</div>
+        <div class="b-hash">#</div>
+        <div class="b-name"><input type="text" id="name-input" maxlength="5" placeholder="NAME" /></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="complete-btn">製作完成 ✨</button>
+</div>
+
+<!-- ── COMPLETION OVERLAY ── -->
+<div id="overlay">
+  <div id="overlay-bg"></div>
+  <div id="anim-card">
+    <div class="final-card" id="final-card">
+      <div class="final-food" id="ff-main"></div>
+      <div class="final-food" id="ff-veg"></div>
+      <div class="final-food" id="ff-fruit"></div>
+      <div class="final-food" id="ff-dessert"></div>
+      <div class="final-food" id="ff-drink"></div>
+      <div class="final-food" id="ff-name-sticker"></div>
+      <div id="ff-name"></div>
+    </div>
+  </div>
+  <div id="overlay-hint">點擊儲存圖片，即可將套餐卡儲存到裝置</div>
+  <div id="overlay-actions">
+    <button id="overlay-save">儲存圖片</button>
+    <button id="overlay-close">返回繼續編輯</button>
+  </div>
+</div>
+
+<canvas id="save-canvas" width="1080" height="1920"></canvas>
+
+<script>
+// ── STATE ──
+const state = {
+  main: null, veg: null, fruit: null, dessert: null, drink: null, nameSticker: null,
+  bg: '#FFC56E',
+  bgImg: null,
+  positions: {},
+  z: {},
+  topZ: 8
+};
+
+const slotDefaults = {
+  main: { x: 198, y: 128, w: 170, h: 128 },
+  veg: { x: 148.7, y: 115.4, w: 72, h: 72 },
+  fruit: { x: 148.7, y: 231.2, w: 70, h: 70 },
+  dessert: { x: 353.5, y: 115.4, w: 69, h: 69 },
+  drink: { x: 355.5, y: 210.6, w: 67, h: 67 },
+  nameSticker: { x: 200, y: 269.5, w: 160, h: 45 }
+};
+
+const foodTypes = ['main', 'veg', 'fruit', 'dessert', 'drink', 'nameSticker'];
+const saveCanvasSize = { width: 360, height: 640 };
+const saveScale = 3;
+const nameLabel = { right: 155, bottom: 62, width: 102, fontSize: 16, lineHeight: 19 };
+const dragBounds = { left: 48, top: 48, right: 48, bottom: 54 };
+const stickerDir = '素材/貼紙/';
+
+resetSlotLayout();
+
+const setPresets = {
+  set1: {
+    main: foodImage('素材/O.png', '寂凸怪蛋吐司'),
+    veg: foodImage('素材/O1.png', '南瓜'),
+    fruit: foodImage('素材/O2.png', '柳橙'),
+    dessert: foodImage('素材/O3.png', '香蕉布丁'),
+    drink: foodImage('素材/O4.png', '花草茶'),
+    nameSticker: nameStickerImage('O')
+  },
+  set2: {
+    main: foodImage('素材/P.png', '睏飽寶漢堡包'),
+    veg: foodImage('素材/P1.png', '甜菜根'),
+    fruit: foodImage('素材/P2.png', '櫻桃'),
+    dessert: foodImage('素材/P3.png', '草莓優格'),
+    drink: foodImage('素材/P4.png', '能量飲'),
+    nameSticker: nameStickerImage('P')
+  },
+  set3: {
+    main: foodImage('素材/B.png', '夜魔瞎肉夾饃'),
+    veg: foodImage('素材/B1.png', '茄子'),
+    fruit: foodImage('素材/B2.png', '藍莓'),
+    dessert: foodImage('素材/B3.png', '蝶豆花凍'),
+    drink: foodImage('素材/B4.png', '桑椹果醋'),
+    nameSticker: nameStickerImage('B')
+  },
+  set4: {
+    main: foodImage('素材/G.png', '小燒貨大燒餅'),
+    veg: foodImage('素材/G1.png', '苦瓜'),
+    fruit: foodImage('素材/G2.png', '奇異果'),
+    dessert: foodImage('素材/G3.png', '綠豆湯'),
+    drink: foodImage('素材/G4.png', '蘆薈汁'),
+    nameSticker: nameStickerImage('G')
+  },
+};
+
+function foodImage(src, alt) {
+  return { src: stickerSrcFromOriginal(src), alt };
+}
+
+function nameStickerImage(family) {
+  return { src: `${stickerDir}${family}name.png`, alt: `${family} name` };
+}
+
+function stickerSrcFromOriginal(src) {
+  return stickerDir + src.split('/').pop();
+}
+
+function familyFromSrc(src) {
+  const file = src.split('/').pop() || '';
+  const family = file.charAt(0).toUpperCase();
+  return ['O', 'P', 'B', 'G'].includes(family) ? family : null;
+}
+
+const imageCache = new Map();
+const preloadAssets = [
+  '素材/IGYT.png',
+  '素材/小卡.png',
+  '素材/O.png','素材/O1.png','素材/O2.png','素材/O3.png','素材/O4.png',
+  '素材/P.png','素材/P1.png','素材/P2.png','素材/P3.png','素材/P4.png',
+  '素材/B.png','素材/B1.png','素材/B2.png','素材/B3.png','素材/B4.png',
+  '素材/G.png','素材/G1.png','素材/G2.png','素材/G3.png','素材/G4.png',
+  '素材/貼紙/O.png','素材/貼紙/O1.png','素材/貼紙/O2.png','素材/貼紙/O3.png','素材/貼紙/O4.png','素材/貼紙/Oname.png',
+  '素材/貼紙/P.png','素材/貼紙/P1.png','素材/貼紙/P2.png','素材/貼紙/P3.png','素材/貼紙/P4.png','素材/貼紙/Pname.png',
+  '素材/貼紙/B.png','素材/貼紙/B1.png','素材/貼紙/B2.png','素材/貼紙/B3.png','素材/貼紙/B4.png','素材/貼紙/Bname.png',
+  '素材/貼紙/G.png','素材/貼紙/G1.png','素材/貼紙/G2.png','素材/貼紙/G3.png','素材/貼紙/G4.png','素材/貼紙/Gname.png',
+  '素材/背景/01.png','素材/背景/02.png?v=20260505','素材/背景/03.png','素材/背景/04.png?v=20260505',
+  '素材/背景/05.png','素材/背景/06.png','素材/背景/07.png','素材/背景/08.png',
+  '素材/背景/09.png','素材/背景/10.png','素材/背景/11.png','素材/背景/12.png',
+  '素材/背景/13.png','素材/背景/14.png','素材/背景/15.png','素材/背景/16.png'
+];
+preloadAssets.forEach(preloadImage);
+
+// ── NAV ──
+const noScrollCats = ['set', 'main', 'veg', 'fruit', 'dessert', 'drink'];
+const menuPanel = document.getElementById('menu-panel');
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.menu-category').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('cat-' + btn.dataset.cat).classList.add('active');
+    menuPanel.classList.toggle('no-scroll', noScrollCats.includes(btn.dataset.cat));
+    menuPanel.scrollTop = 0;
+  });
+});
+
+// ── ADD BUTTONS ──
+document.querySelectorAll('.add-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const card = btn.closest('.item-card');
+    addItem(card);
+  });
+});
+
+document.querySelectorAll('.item-card').forEach(card => {
+  card.addEventListener('click', () => addItem(card));
+});
+
+function addItem(card) {
+  const type = card.dataset.type;
+  const id = card.dataset.id;
+
+  if (type === 'set') {
+    // clear individual selections, apply set
+    const preset = setPresets[id];
+    resetSlotLayout();
+    state.main = preset.main;
+    state.veg = preset.veg;
+    state.fruit = preset.fruit;
+    state.dessert = preset.dessert;
+    state.drink = preset.drink;
+    state.nameSticker = preset.nameSticker;
+    updateSlot('main', state.main);
+    updateSlot('veg', state.veg);
+    updateSlot('fruit', state.fruit);
+    updateSlot('dessert', state.dessert);
+    updateSlot('drink', state.drink);
+    updateSlot('nameSticker', state.nameSticker);
+
+  } else if (type === 'bg') {
+    state.bgImg = card.dataset.img;
+    applyStageBackground();
+
+  } else {
+    // individual item — if switching from set context, no change needed
+    // if same type already set, replace it
+    const item = foodImage(card.dataset.img, card.dataset.alt);
+    state[type] = item;
+    updateSlot(type, item);
+    if (type === 'main') {
+      state.nameSticker = nameStickerImage(familyFromSrc(card.dataset.img));
+      updateSlot('nameSticker', state.nameSticker);
+    }
+  }
+
+  // button feedback
+  const btn = card.querySelector('.add-btn');
+  const orig = btn.textContent;
+  btn.textContent = '✓ 已加入';
+  btn.style.background = '#4CAF50';
+  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 800);
+}
+
+function applyStageBackground() {
+  const stage = document.getElementById('stage');
+  const overlayBg = document.getElementById('overlay-bg');
+  if (state.bgImg) {
+    stage.style.backgroundColor = state.bg;
+    stage.style.backgroundImage = `url("${state.bgImg}")`;
+    stage.style.backgroundSize = 'cover';
+    stage.style.backgroundPosition = 'center';
+    overlayBg.style.backgroundColor = state.bg;
+    overlayBg.style.backgroundImage = `url("${state.bgImg}")`;
+    overlayBg.style.backgroundSize = 'cover';
+    overlayBg.style.backgroundPosition = 'center';
+  } else {
+    stage.style.backgroundColor = state.bg;
+    stage.style.backgroundImage = 'none';
+    overlayBg.style.backgroundColor = state.bg;
+    overlayBg.style.backgroundImage = 'none';
+  }
+}
+
+function updateSlot(type, item) {
+  const slot = document.getElementById(slotId(type));
+  applySlotLayout(type);
+  if (!item) {
+    slot.classList.remove('filled');
+    slot.classList.add('empty');
+    slot.replaceChildren();
+    return;
+  }
+  slot.classList.remove('filled','empty');
+  slot.replaceChildren(createFoodImg(item));
+  // force reflow for animation
+  void slot.offsetWidth;
+  slot.classList.add('filled');
+}
+
+function resetSlotLayout() {
+  foodTypes.forEach((type, index) => {
+    state.positions[type] = {
+      x: slotDefaults[type].x,
+      y: slotDefaults[type].y
+    };
+    state.z[type] = 8 + index;
+  });
+  state.topZ = 8 + foodTypes.length;
+}
+
+function applySlotLayout(type) {
+  const slot = document.getElementById(slotId(type));
+  const pos = state.positions[type] || slotDefaults[type];
+  slot.style.left = `${pos.x}px`;
+  slot.style.top = `${pos.y}px`;
+  slot.style.zIndex = state.z[type] || 8;
+}
+
+function bringSlotToFront(type) {
+  state.topZ += 1;
+  state.z[type] = state.topZ;
+  applySlotLayout(type);
+}
+
+foodTypes.forEach(type => {
+  applySlotLayout(type);
+  const slot = document.getElementById(slotId(type));
+  slot.addEventListener('pointerdown', e => startDragFood(e, type));
+  slot.addEventListener('dragstart', e => e.preventDefault());
+});
+
+document.addEventListener('dragstart', e => {
+  if (e.target.closest('.food-slot')) e.preventDefault();
+});
+
+function startDragFood(e, type) {
+  if (!state[type]) return;
+  e.preventDefault();
+
+  const tray = document.getElementById('tray');
+  const slot = document.getElementById(slotId(type));
+  const trayRect = tray.getBoundingClientRect();
+  const pos = state.positions[type];
+  const startX = e.clientX;
+  const startY = e.clientY;
+  const originX = pos.x;
+  const originY = pos.y;
+
+  bringSlotToFront(type);
+  slot.classList.add('dragging');
+  slot.setPointerCapture(e.pointerId);
+
+  const moveFood = moveEvent => {
+    const nextX = originX + moveEvent.clientX - startX;
+    const nextY = originY + moveEvent.clientY - startY;
+    const maxX = trayRect.width - dragBounds.right - slot.offsetWidth;
+    const maxY = trayRect.height - dragBounds.bottom - slot.offsetHeight;
+    state.positions[type] = {
+      x: clamp(nextX, dragBounds.left, maxX),
+      y: clamp(nextY, dragBounds.top, maxY)
+    };
+    applySlotLayout(type);
+  };
+
+  const stopDrag = () => {
+    slot.classList.remove('dragging');
+    slot.removeEventListener('pointermove', moveFood);
+    slot.removeEventListener('pointerup', stopDrag);
+    slot.removeEventListener('pointercancel', stopDrag);
+    slot.removeEventListener('lostpointercapture', stopDrag);
+  };
+
+  slot.addEventListener('pointermove', moveFood);
+  slot.addEventListener('pointerup', stopDrag);
+  slot.addEventListener('pointercancel', stopDrag);
+  slot.addEventListener('lostpointercapture', stopDrag);
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function slotId(type) {
+  return type === 'nameSticker' ? 'slot-name-sticker' : `slot-${type}`;
+}
+
+function finalSlotId(type) {
+  return type === 'nameSticker' ? 'ff-name-sticker' : `ff-${type}`;
+}
+
+function createFoodImg(item) {
+  const img = document.createElement('img');
+  img.src = item.src;
+  img.alt = item.alt;
+  img.draggable = false;
+  return img;
+}
+
+// ── NAME INPUT ──
+const nameInput = document.getElementById('name-input');
+nameInput.addEventListener('input', () => {
+  // limit to 5 chars
+  if (nameInput.value.length > 5) nameInput.value = nameInput.value.slice(0,5);
+});
+
+function getEnteredName() {
+  return nameInput.value.trim();
+}
+
+// ── COMPLETE BUTTON ──
+document.getElementById('complete-btn').addEventListener('click', () => {
+  // populate final card
+  updateFinalFood('main', state.main);
+  updateFinalFood('veg', state.veg);
+  updateFinalFood('fruit', state.fruit);
+  updateFinalFood('dessert', state.dessert);
+  updateFinalFood('drink', state.drink);
+  updateFinalFood('nameSticker', state.nameSticker);
+  document.getElementById('ff-name').textContent = getEnteredName();
+  applyStageBackground();
+
+  // reset animation
+  const animCard = document.getElementById('anim-card');
+  animCard.style.animation = 'none';
+  void animCard.offsetWidth;
+  animCard.style.animation = '';
+
+  document.getElementById('overlay').classList.add('show');
+
+  spawnConfetti();
+});
+
+function updateFinalFood(type, item) {
+  const slot = document.getElementById(finalSlotId(type));
+  slot.replaceChildren();
+  applyFinalFoodLayout(type);
+  if (item) slot.appendChild(createFoodImg(item));
+}
+
+function applyFinalFoodLayout(type) {
+  const slot = document.getElementById(finalSlotId(type));
+  const pos = state.positions[type] || slotDefaults[type];
+  slot.style.left = `${pos.x}px`;
+  slot.style.top = `${pos.y}px`;
+  slot.style.zIndex = state.z[type] || 8;
+}
+
+// ── CONFETTI ──
+function spawnConfetti() {
+  const overlay = document.getElementById('overlay');
+  const colors = ['#fff','#FFD700','#FF69B4','#00CED1','#FF6347'];
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      top:${Math.random()*30}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      width:${6+Math.random()*10}px;
+      height:${6+Math.random()*10}px;
+      animation-delay:${Math.random()*0.5}s;
+      animation-duration:${1+Math.random()*1}s;
+    `;
+    overlay.appendChild(p);
+    setTimeout(() => p.remove(), 2000);
+  }
+}
+
+// ── CLOSE OVERLAY ──
+document.getElementById('overlay-close').addEventListener('click', () => {
+  document.getElementById('overlay').classList.remove('show');
+});
+
+// ── SAVE BUTTON ──
+const saveHintDefault = '點擊儲存圖片，即可將套餐卡儲存到裝置';
+const saveButton = document.getElementById('overlay-save');
+saveButton.addEventListener('click', saveCardNow);
+
+async function saveCardNow() {
+  saveButton.disabled = true;
+  saveButton.textContent = '儲存中';
+  document.getElementById('overlay-hint').textContent = '正在準備圖片...';
+
+  try {
+    const canvas = await renderSaveCanvas();
+    const result = await downloadCanvas(canvas, 'monster-meal.png');
+    const messages = {
+      picked: '套餐卡已儲存！',
+      shared: '請在系統選單中選擇儲存圖片',
+      opened: '圖片已開啟，請長按或右鍵儲存',
+      downloaded: '套餐卡已儲存！'
+    };
+    showSaveFeedback(messages[result] || messages.downloaded);
+  } catch (err) {
+    if (err && err.name === 'AbortError') {
+      document.getElementById('overlay-hint').textContent = saveHintDefault;
+    } else if (isCanvasExportBlocked(err)) {
+      document.getElementById('overlay-hint').textContent = '請用本機網址開啟頁面後再儲存圖片';
+      console.error(err);
+    } else {
+      document.getElementById('overlay-hint').textContent = '圖片儲存失敗，請再試一次';
+      console.error(err);
+    }
+  } finally {
+    saveButton.disabled = false;
+    saveButton.textContent = '儲存圖片';
+  }
+}
+
+async function renderSaveCanvas() {
+  const canvas = document.getElementById('save-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = saveCanvasSize.width * saveScale;
+  canvas.height = saveCanvasSize.height * saveScale;
+  ctx.setTransform(saveScale, 0, 0, saveScale, 0, 0);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  if (state.bgImg) {
+    const bg = await loadCanvasImage(state.bgImg);
+    drawCoverImage(ctx, bg, 0, 0, saveCanvasSize.width, saveCanvasSize.height);
+  } else {
+    ctx.fillStyle = state.bg || '#FFC56E';
+    ctx.fillRect(0, 0, saveCanvasSize.width, saveCanvasSize.height);
+  }
+
+  const footer = await loadCanvasImage('素材/IGYT.png');
+  const footerW = saveCanvasSize.width;
+  const footerH = footerW * footer.height / footer.width;
+  const footerX = (saveCanvasSize.width - footerW) / 2;
+  const footerY = saveCanvasSize.height - footerH;
+
+  const card = await loadCanvasImage('素材/小卡.png');
+  const cardScale = 0.52;
+  const cardW = 560 * cardScale;
+  const cardH = 393 * cardScale;
+  const cardX = (saveCanvasSize.width - cardW) / 2;
+  const cardY = Math.max(80, (footerY - cardH) / 2);
+  ctx.drawImage(card, cardX, cardY, cardW, cardH);
+
+  await drawCanvasFoods(ctx, cardX, cardY, cardScale);
+
+  const name = getEnteredName();
+  if (name) {
+    const nameX = 560 - nameLabel.right - nameLabel.width / 2;
+    const nameY = 393 - nameLabel.bottom - nameLabel.lineHeight / 2;
+    ctx.save();
+    ctx.translate(cardX + nameX * cardScale, cardY + nameY * cardScale);
+    ctx.rotate(-4 * Math.PI / 180);
+    ctx.fillStyle = '#333';
+    ctx.font = `${nameLabel.fontSize * cardScale}px "Mantou Sans", "饅頭黑體", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(name, 0, 0);
+    ctx.restore();
+  }
+
+  ctx.drawImage(footer, footerX, footerY, footerW, footerH);
+
+  return canvas;
+}
+
+function showSaveFeedback(message = '套餐卡已儲存！') {
+  const hint = document.getElementById('overlay-hint');
+  hint.textContent = message;
+  setTimeout(() => { hint.textContent = saveHintDefault; }, 2000);
+}
+
+function loadCanvasImage(src) {
+  const cached = imageCache.get(src);
+  if (cached && cached.complete && cached.naturalWidth) return Promise.resolve(cached);
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      imageCache.set(src, img);
+      resolve(img);
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+function preloadImage(src) {
+  if (imageCache.has(src)) return imageCache.get(src);
+  const img = new Image();
+  img.onload = () => imageCache.set(src, img);
+  img.src = src;
+  imageCache.set(src, img);
+  return img;
+}
+
+function getCachedImage(src) {
+  const img = imageCache.get(src) || preloadImage(src);
+  if (!img.complete || !img.naturalWidth) throw new Error(`Image not ready: ${src}`);
+  return img;
+}
+
+async function downloadCanvas(canvas, filename) {
+  const blob = await canvasToBlob(canvas);
+  if (!blob) {
+    downloadDataUrl(canvas, filename);
+    return 'downloaded';
+  }
+
+  const file = typeof File === 'function' ? new File([blob], filename, { type: 'image/png' }) : null;
+  if (shouldUseNativeShare(file)) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: 'Moonster Meal',
+        text: '我的 Moonster 早餐套餐卡'
+      });
+      return 'shared';
+    } catch (err) {
+      if (err && err.name === 'AbortError') throw err;
+    }
+  }
+
+  if (downloadBlob(blob, filename)) return 'downloaded';
+  if (await saveWithPicker(blob, filename)) return 'picked';
+  openBlobImage(blob);
+  return 'opened';
+}
+
+function shouldUseNativeShare(file) {
+  const isTouchDevice = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+  return Boolean(
+    isTouchDevice &&
+    file &&
+    navigator.canShare &&
+    navigator.canShare({ files: [file] }) &&
+    navigator.share
+  );
+}
+
+async function saveWithPicker(blob, filename) {
+  if (typeof showSaveFilePicker !== 'function') return false;
+  if (matchMedia('(pointer: coarse)').matches) return false;
+
+  try {
+    const handle = await showSaveFilePicker({
+      suggestedName: filename,
+      types: [{
+        description: 'PNG image',
+        accept: { 'image/png': ['.png'] }
+      }]
+    });
+    const writable = await handle.createWritable();
+    await writable.write(blob);
+    await writable.close();
+    return true;
+  } catch (err) {
+    if (err && err.name === 'AbortError') throw err;
+    return false;
+  }
+}
+
+function canvasToBlob(canvas) {
+  if (!canvas.toBlob) return Promise.resolve(null);
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+}
+
+function isCanvasExportBlocked(err) {
+  const message = String(err && err.message || '');
+  return (
+    err &&
+    (err.name === 'SecurityError' ||
+      message.includes('tainted') ||
+      message.includes('insecure') ||
+      message.includes('cross-origin'))
+  );
+}
+
+function downloadBlob(blob, filename) {
+  const link = document.createElement('a');
+  if (!('download' in link)) {
+    return false;
+  }
+
+  try {
+    const url = URL.createObjectURL(blob);
+    link.download = filename;
+    link.href = url;
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return true;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+}
+
+function downloadDataUrl(canvas, filename) {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.rel = 'noopener';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function openBlobImage(blob) {
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank', 'noopener');
+  if (!win) location.href = url;
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+function drawCoverImage(ctx, img, x, y, w, h) {
+  const scale = Math.max(w / img.width, h / img.height);
+  const sw = w / scale;
+  const sh = h / scale;
+  const sx = (img.width - sw) / 2;
+  const sy = (img.height - sh) / 2;
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+}
+
+async function drawCanvasFood(ctx, item, x, y, w, h) {
+  if (!item) return;
+  const img = await loadCanvasImage(item.src);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.25)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 4;
+  drawContainImage(ctx, img, x, y, w, h);
+  ctx.restore();
+}
+
+function drawCanvasFoodSync(ctx, item, x, y, w, h) {
+  if (!item) return;
+  const img = getCachedImage(item.src);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.25)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 4;
+  drawContainImage(ctx, img, x, y, w, h);
+  ctx.restore();
+}
+
+function drawContainImage(ctx, img, centerX, centerY, boxW, boxH) {
+  const scale = Math.min(boxW / img.width, boxH / img.height);
+  const drawW = img.width * scale;
+  const drawH = img.height * scale;
+  ctx.drawImage(img, centerX - drawW / 2, centerY - drawH / 2, drawW, drawH);
+}
+
+async function drawCanvasFoods(ctx, cardX, cardY, cardScale) {
+  const orderedTypes = [...foodTypes].sort((a, b) => (state.z[a] || 0) - (state.z[b] || 0));
+  for (const type of orderedTypes) {
+    await drawCanvasFoodAtPosition(ctx, type, cardX, cardY, cardScale);
+  }
+}
+
+function drawCanvasFoodsSync(ctx, cardX, cardY, cardScale) {
+  const orderedTypes = [...foodTypes].sort((a, b) => (state.z[a] || 0) - (state.z[b] || 0));
+  orderedTypes.forEach(type => drawCanvasFoodAtPositionSync(ctx, type, cardX, cardY, cardScale));
+}
+
+async function drawCanvasFoodAtPosition(ctx, type, cardX, cardY, cardScale) {
+  const item = state[type];
+  if (!item) return;
+  const size = slotDefaults[type];
+  const pos = state.positions[type] || size;
+  await drawCanvasFood(
+    ctx,
+    item,
+    cardX + (pos.x + size.w / 2) * cardScale,
+    cardY + (pos.y + size.h / 2) * cardScale,
+    size.w * cardScale,
+    size.h * cardScale
+  );
+}
+
+function drawCanvasFoodAtPositionSync(ctx, type, cardX, cardY, cardScale) {
+  const item = state[type];
+  if (!item) return;
+  const size = slotDefaults[type];
+  const pos = state.positions[type] || size;
+  drawCanvasFoodSync(
+    ctx,
+    item,
+    cardX + (pos.x + size.w / 2) * cardScale,
+    cardY + (pos.y + size.h / 2) * cardScale,
+    size.w * cardScale,
+    size.h * cardScale
+  );
+}
+</script>
+</body>
+</html>
