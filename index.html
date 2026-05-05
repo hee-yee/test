@@ -101,6 +101,16 @@
     flex-shrink:0;
     border-right:2px solid #f0f0f0;
   }
+  #cat-set,
+  #cat-main{
+    transform:translate(-12px,-26px);
+  }
+  #cat-veg,
+  #cat-fruit,
+  #cat-dessert,
+  #cat-drink{
+    transform:translate(-14px,16px);
+  }
   #menu-panel::-webkit-scrollbar{width:4px;}
   #menu-panel::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px;}
   #menu-panel.no-scroll{
@@ -519,7 +529,7 @@
   /* BREAKFAST label */
   .tray-breakfast{
     position:absolute;
-    right:155px;bottom:62px;
+    right:155px;bottom:52px;
     transform:rotate(-4deg);
     display:flex;align-items:center;gap:8px;
     z-index:9;
@@ -726,7 +736,7 @@
   #ff-drink{width:67px;height:67px;}
   #ff-name{
     position:absolute;
-    right:155px;bottom:62px;
+    right:155px;bottom:52px;
     width:102px;
     transform:rotate(-4deg);
     color:#333;
@@ -1001,7 +1011,7 @@
       <div class="item-img"><img src="素材/P2.png" alt="櫻桃" width="80" height="80"></div>
       <div class="item-info">
         <div class="item-name title-img"><img src="素材/副餐名/水果2.png" alt="02 櫻桃"></div>
-        <div class="item-sub">調節生理時鐘、維護腸胃</div>
+        <div class="item-sub">提升睡眠品質</div>
       </div>
       <button class="add-btn">加入購物車</button>
     </div>
@@ -1278,7 +1288,7 @@ const slotDefaults = {
 const foodTypes = ['main', 'veg', 'fruit', 'dessert', 'drink', 'nameSticker'];
 const saveCanvasSize = { width: 360, height: 640 };
 const saveScale = 3;
-const nameLabel = { right: 155, bottom: 62, width: 102, fontSize: 16, lineHeight: 19 };
+const nameLabel = { right: 155, bottom: 52, width: 102, fontSize: 16, lineHeight: 19 };
 const dragBounds = { left: 48, top: 48, right: 48, bottom: 54 };
 const stickerDir = '素材/貼紙/';
 const mealBaseSize = { width: 560, height: 448, trayHeight: 393 };
@@ -1660,6 +1670,7 @@ document.getElementById('overlay-close').addEventListener('click', () => {
 
 // ── SAVE BUTTON ──
 const saveHintDefault = '點擊儲存圖片，即可將套餐卡儲存到裝置';
+const saveSuccessMessage = '已儲存圖片';
 const saveButton = document.getElementById('overlay-save');
 saveButton.addEventListener('click', saveCardNow);
 
@@ -1672,10 +1683,10 @@ async function saveCardNow() {
     const canvas = await renderSaveCanvas();
     const result = await downloadCanvas(canvas, 'monster-meal.png');
     const messages = {
-      picked: '套餐卡已儲存！',
+      picked: saveSuccessMessage,
       shared: '請在系統選單中選擇儲存圖片',
       opened: '圖片已開啟，請長按或右鍵儲存',
-      downloaded: '套餐卡已儲存！'
+      downloaded: saveSuccessMessage
     };
     showSaveFeedback(messages[result] || messages.downloaded);
   } catch (err) {
@@ -1749,19 +1760,13 @@ async function renderSaveCanvas() {
   return canvas;
 }
 
-function showSaveFeedback(message = '套餐卡已儲存！') {
+function showSaveFeedback(message = saveSuccessMessage) {
   const hint = document.getElementById('overlay-hint');
   const button = document.getElementById('overlay-save');
   hint.textContent = message;
   hint.classList.add('success');
   button.classList.add('saved');
   button.textContent = '已儲存';
-  setTimeout(() => {
-    hint.textContent = saveHintDefault;
-    hint.classList.remove('success');
-    button.classList.remove('saved');
-    button.textContent = '儲存圖片';
-  }, 2400);
 }
 
 function loadCanvasImage(src) {
