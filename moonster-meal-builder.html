@@ -104,13 +104,13 @@
   }
   #cat-set,
   #cat-main{
-    transform:translate(-8px,-8px);
+    transform:translate(-8px,12px);
   }
   #cat-veg,
   #cat-fruit,
   #cat-dessert,
   #cat-drink{
-    transform:translate(-6px,-10px);
+    transform:translate(-6px,-28px);
   }
   #menu-panel::-webkit-scrollbar{width:4px;}
   #menu-panel::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px;}
@@ -552,14 +552,19 @@
     display:flex;
     align-items:center;
     justify-content:center;
+    position:relative;
+    overflow:hidden;
     font-size:13px;font-weight:700;color:#999;
   }
   .tray-breakfast .b-name input{
+    position:absolute;
+    inset:0;
     border:none;outline:none;
     font-family:var(--font-main);
     font-size:var(--name-font-size, 16px);
     font-weight:400;
-    color:#333;
+    color:transparent;
+    caret-color:#333;
     width:102px;
     height:22px;
     line-height:22px;
@@ -567,6 +572,24 @@
     text-align:center;
     background:transparent;
     letter-spacing:.06em;
+    z-index:2;
+  }
+  .name-display{
+    width:100%;
+    height:22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:var(--name-font-size, 16px);
+    line-height:22px;
+    color:#333;
+    letter-spacing:.06em;
+    white-space:nowrap;
+    pointer-events:none;
+    z-index:1;
+  }
+  .name-display.placeholder{
+    color:#999;
   }
   .tray-breakfast .b-hash{
     background:#222;color:#fff;
@@ -991,14 +1014,14 @@
 
     #cat-set,
     #cat-main{
-      transform:translateY(8px);
+      transform:translateY(18px);
     }
 
     #cat-veg,
     #cat-fruit,
     #cat-dessert,
     #cat-drink{
-      transform:translateY(-8px);
+      transform:translateY(-18px);
     }
 
     .menu-category.active,
@@ -1605,7 +1628,10 @@
       <div class="tray-breakfast">
         <div class="b-label">BREAKFAST</div>
         <div class="b-hash">#</div>
-        <div class="b-name"><input type="text" id="name-input" maxlength="10" placeholder="NAME" /></div>
+        <div class="b-name">
+          <input type="text" id="name-input" maxlength="10" aria-label="姓名" />
+          <span class="name-display placeholder" id="name-display">NAME</span>
+        </div>
       </div>
     </div>
   </div>
@@ -1659,7 +1685,7 @@ const slotDefaults = {
 const foodTypes = ['main', 'veg', 'fruit', 'dessert', 'drink', 'nameSticker'];
 const saveCanvasSize = { width: 360, height: 640 };
 const saveScale = 3;
-const nameLabel = { right: 155, bottom: 60, width: 102, fontSize: 16, minFontSize: 10, lineHeight: 19 };
+const nameLabel = { right: 155, bottom: 60, width: 102, fontSize: 16, minFontSize: 7, lineHeight: 19 };
 const dragBounds = { left: 48, top: 48, right: 48, bottom: 54 };
 const stickerDir = '素材/貼紙/';
 const mealBaseSize = { width: 560, height: 448, trayHeight: 393 };
@@ -1953,6 +1979,7 @@ function createFoodImg(item) {
 
 // ── NAME INPUT ──
 const nameInput = document.getElementById('name-input');
+const nameDisplay = document.getElementById('name-display');
 const nameMeasureCanvas = document.createElement('canvas');
 const nameMeasureContext = nameMeasureCanvas.getContext('2d');
 nameInput.addEventListener('input', () => {
@@ -1987,7 +2014,12 @@ function nameFontSizeForText(text) {
 function updateNameInputSize() {
   const size = nameFontSizeForText(nameInput.value);
   document.documentElement.style.setProperty('--name-font-size', `${size}px`);
+  nameDisplay.textContent = nameInput.value || 'NAME';
+  nameDisplay.classList.toggle('placeholder', !nameInput.value);
   nameInput.scrollLeft = 0;
+  requestAnimationFrame(() => {
+    nameInput.scrollLeft = 0;
+  });
   return size;
 }
 
