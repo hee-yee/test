@@ -104,13 +104,13 @@
   }
   #cat-set,
   #cat-main{
-    transform:translate(-8px,-26px);
+    transform:translate(-8px,-8px);
   }
   #cat-veg,
   #cat-fruit,
   #cat-dessert,
   #cat-drink{
-    transform:translate(-6px,16px);
+    transform:translate(-6px,-10px);
   }
   #menu-panel::-webkit-scrollbar{width:4px;}
   #menu-panel::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px;}
@@ -547,7 +547,11 @@
     background:transparent;
     border-radius:0;
     padding:0;
-    min-width:102px;
+    width:102px;
+    height:22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     font-size:13px;font-weight:700;color:#999;
   }
   .tray-breakfast .b-name input{
@@ -557,6 +561,9 @@
     font-weight:400;
     color:#333;
     width:102px;
+    height:22px;
+    line-height:22px;
+    padding:0;
     text-align:center;
     background:transparent;
     letter-spacing:.06em;
@@ -740,9 +747,14 @@
     position:absolute;
     right:155px;bottom:60px;
     width:102px;
+    height:22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     transform:rotate(-4deg);
     color:#333;
-    font-size:16px;
+    font-size:var(--name-font-size, 16px);
+    line-height:22px;
     font-weight:400;
     text-align:center;
     letter-spacing:.06em;
@@ -829,6 +841,363 @@
   @keyframes confettiFall{
     0%{transform:translateY(-100px) rotate(0deg);opacity:1;}
     100%{transform:translateY(600px) rotate(720deg);opacity:0;}
+  }
+
+  @media (min-width:768px) and (max-width:1180px){
+    :root{
+      --sidebar-w:58px;
+      --menu-w:270px;
+    }
+
+    #sidebar{
+      padding-top:30px;
+      gap:20px;
+    }
+
+    #sidebar .logo{
+      width:42px;
+      height:42px;
+      margin-bottom:22px;
+    }
+
+    #sidebar .logo img{
+      width:42px;
+      height:42px;
+    }
+
+    #menu-panel{
+      padding-left:18px;
+      padding-right:8px;
+    }
+
+    .item-card[data-type="set"],
+    .item-card[data-type="main"],
+    .item-card[data-type="veg"],
+    .item-card[data-type="fruit"],
+    .item-card[data-type="dessert"],
+    .item-card[data-type="drink"]{
+      width:238px;
+    }
+
+    .item-name.title-img img{
+      max-width:238px;
+    }
+
+    .item-card[data-type="set"] .item-img,
+    .item-card[data-type="main"] .item-img{
+      width:100px;
+      height:80px;
+    }
+
+    .item-card[data-type="set"],
+    .item-card[data-type="main"]{
+      grid-template-columns:104px minmax(0,1fr);
+    }
+  }
+
+  @media (max-width:767px){
+    html,
+    body{
+      overflow:hidden;
+    }
+
+    body{
+      flex-direction:column;
+    }
+
+    #sidebar{
+      width:100%;
+      height:70px;
+      flex-direction:row;
+      align-items:center;
+      justify-content:flex-start;
+      gap:10px;
+      padding:10px 12px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+    }
+
+    #sidebar::-webkit-scrollbar,
+    #menu-panel::-webkit-scrollbar{
+      display:none;
+    }
+
+    #sidebar .logo{
+      width:42px;
+      height:42px;
+      margin:0 4px 0 0;
+      flex:0 0 auto;
+    }
+
+    #sidebar .logo img{
+      width:42px;
+      height:42px;
+    }
+
+    .nav-btn{
+      width:auto;
+      min-width:52px;
+      height:36px;
+      padding:0 10px;
+      flex:0 0 auto;
+      border-width:2px;
+      border-radius:9px;
+      font-size:14px;
+      letter-spacing:.08em;
+      text-indent:.08em;
+    }
+
+    #stage{
+      width:100%;
+      flex:1 1 auto;
+      min-height:0;
+      order:2;
+    }
+
+    #stage::before{
+      background-size:34px 34px;
+      opacity:.42;
+    }
+
+    #menu-panel{
+      order:3;
+      width:100%;
+      height:238px;
+      flex:0 0 238px;
+      border-right:0;
+      border-top:2px solid #f0f0f0;
+      padding:48px 16px 20px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+    }
+
+    #menu-panel.no-scroll{
+      overflow-x:auto;
+      overflow-y:hidden;
+      padding-top:48px;
+      padding-bottom:20px;
+    }
+
+    #cat-set,
+    #cat-main,
+    #cat-veg,
+    #cat-fruit,
+    #cat-dessert,
+    #cat-drink{
+      transform:none;
+    }
+
+    #cat-set,
+    #cat-main{
+      transform:translateY(8px);
+    }
+
+    #cat-veg,
+    #cat-fruit,
+    #cat-dessert,
+    #cat-drink{
+      transform:translateY(-8px);
+    }
+
+    .menu-category.active,
+    #cat-veg.active,
+    #cat-fruit.active,
+    #cat-dessert.active,
+    #cat-drink.active{
+      min-height:0;
+      height:100%;
+      width:max-content;
+      display:flex;
+      flex-direction:row;
+      align-items:flex-start;
+      justify-content:flex-start;
+      gap:18px;
+    }
+
+    .item-card,
+    .item-card[data-type="set"],
+    .item-card[data-type="main"],
+    .item-card[data-type="veg"],
+    .item-card[data-type="fruit"],
+    .item-card[data-type="dessert"],
+    .item-card[data-type="drink"]{
+      width:232px;
+      height:116px;
+      min-height:0;
+      margin:0;
+      flex:0 0 232px;
+      border-radius:16px;
+      box-shadow:0 6px 18px rgba(0,0,0,.12);
+    }
+
+    .item-card[data-type="set"],
+    .item-card[data-type="main"]{
+      grid-template-columns:98px minmax(0,1fr);
+      padding:13px 12px;
+    }
+
+    .item-card[data-type="veg"],
+    .item-card[data-type="fruit"],
+    .item-card[data-type="dessert"],
+    .item-card[data-type="drink"]{
+      grid-template-columns:72px minmax(0,1fr);
+      padding:14px 12px;
+    }
+
+    .item-card[data-type="set"] .item-img,
+    .item-card[data-type="main"] .item-img{
+      width:92px;
+      height:76px;
+    }
+
+    .item-card[data-type="veg"] .item-img,
+    .item-card[data-type="fruit"] .item-img,
+    .item-card[data-type="dessert"] .item-img,
+    .item-card[data-type="drink"] .item-img{
+      width:66px;
+      height:64px;
+    }
+
+    .item-name.title-img{
+      top:-38px;
+      left:0;
+      height:38px;
+    }
+
+    .item-name.title-img img,
+    .item-card[data-id="set1"] .item-name.title-img img,
+    .item-card[data-id="set2"] .item-name.title-img img,
+    .item-card[data-id="set3"] .item-name.title-img img,
+    .item-card[data-id="set4"] .item-name.title-img img,
+    .item-card[data-id="main1"] .item-name.title-img img,
+    .item-card[data-id="main2"] .item-name.title-img img,
+    .item-card[data-id="main3"] .item-name.title-img img,
+    .item-card[data-id="main4"] .item-name.title-img img,
+    .item-card[data-id="veg3"] .item-name.title-img img,
+    .item-card[data-id="veg4"] .item-name.title-img img,
+    .item-card[data-id="fruit3"] .item-name.title-img img,
+    .item-card[data-id="fruit4"] .item-name.title-img img,
+    .item-card[data-id="drk3"] .item-name.title-img img,
+    .item-card[data-id="drk4"] .item-name.title-img img,
+    .item-card[data-id="des3"] .item-name.title-img img,
+    .item-card[data-id="des4"] .item-name.title-img img{
+      width:auto;
+      height:35px;
+      max-width:224px;
+    }
+
+    .item-card[data-type="set"] .item-sub,
+    .item-card[data-type="main"] .item-sub,
+    .item-sub{
+      font-size:9px;
+      line-height:1.4;
+    }
+
+    .add-btn,
+    .item-card[data-type="set"] .add-btn,
+    .item-card[data-type="main"] .add-btn{
+      padding:7px 12px;
+      border-radius:10px;
+      font-size:13px;
+      margin-left:0;
+    }
+
+    .bg-grid{
+      display:flex;
+      gap:14px;
+    }
+
+    .item-card[data-type="bg"]{
+      width:144px;
+      height:144px;
+      min-height:0;
+      flex:0 0 144px;
+      border-radius:16px;
+    }
+
+    .item-card[data-type="bg"] .item-img{
+      min-height:0;
+      height:144px;
+    }
+
+    #complete-btn{
+      right:14px;
+      bottom:14px;
+      padding:8px 16px;
+      border-width:2px;
+      border-radius:12px;
+      font-size:15px;
+    }
+
+    #anim-card{
+      transform-origin:center;
+      animation:popOutMobile .6s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+
+    @keyframes popOutMobile{
+      0%{transform:scale(0) rotate(-5deg);}
+      100%{transform:scale(.58) rotate(0deg);}
+    }
+
+    #overlay-hint{
+      width:min(86vw, 320px);
+      text-align:center;
+      line-height:1.5;
+      font-size:13px;
+    }
+
+    #overlay-actions{
+      gap:8px;
+    }
+
+    #overlay-save,
+    #overlay-close{
+      padding:8px 14px;
+      font-size:13px;
+    }
+  }
+
+  @media (max-width:390px){
+    #sidebar{
+      height:64px;
+      padding:9px 10px;
+      gap:8px;
+    }
+
+    .nav-btn{
+      min-width:48px;
+      height:34px;
+      padding:0 8px;
+      font-size:13px;
+    }
+
+    #menu-panel{
+      height:220px;
+      flex-basis:220px;
+      padding-top:44px;
+    }
+
+    #menu-panel.no-scroll{
+      padding-top:44px;
+    }
+
+    .item-card,
+    .item-card[data-type="set"],
+    .item-card[data-type="main"],
+    .item-card[data-type="veg"],
+    .item-card[data-type="fruit"],
+    .item-card[data-type="dessert"],
+    .item-card[data-type="drink"]{
+      width:216px;
+      flex-basis:216px;
+    }
+
+    #complete-btn{
+      font-size:14px;
+      padding:8px 13px;
+    }
   }
 </style>
 </head>
@@ -1372,6 +1741,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     document.getElementById('cat-' + btn.dataset.cat).classList.add('active');
     menuPanel.classList.toggle('no-scroll', noScrollCats.includes(btn.dataset.cat));
     menuPanel.scrollTop = 0;
+    menuPanel.scrollLeft = 0;
   });
 });
 
@@ -1583,24 +1953,42 @@ function createFoodImg(item) {
 
 // ── NAME INPUT ──
 const nameInput = document.getElementById('name-input');
+const nameMeasureCanvas = document.createElement('canvas');
+const nameMeasureContext = nameMeasureCanvas.getContext('2d');
 nameInput.addEventListener('input', () => {
   // limit to 10 chars
   if (nameInput.value.length > 10) nameInput.value = nameInput.value.slice(0,10);
   updateNameInputSize();
 });
 updateNameInputSize();
+if (document.fonts) {
+  document.fonts.ready.then(updateNameInputSize);
+}
 
 function getEnteredName() {
   return nameInput.value.trim();
 }
 
-function nameFontSizeForLength(length) {
-  if (length <= 5) return nameLabel.fontSize;
-  return Math.max(nameLabel.minFontSize, nameLabel.fontSize - (length - 5) * 1.1);
+function measuredNameWidth(text, size) {
+  if (!text) return 0;
+  const chars = Array.from(text);
+  nameMeasureContext.font = `${size}px "Mantou Sans", "饅頭黑體", sans-serif`;
+  return nameMeasureContext.measureText(text).width + Math.max(0, chars.length - 1) * size * 0.06;
+}
+
+function nameFontSizeForText(text) {
+  const value = text.trim();
+  for (let size = nameLabel.fontSize; size >= nameLabel.minFontSize; size -= 0.5) {
+    if (measuredNameWidth(value, size) <= nameLabel.width) return size;
+  }
+  return nameLabel.minFontSize;
 }
 
 function updateNameInputSize() {
-  nameInput.style.setProperty('--name-font-size', `${nameFontSizeForLength(nameInput.value.length)}px`);
+  const size = nameFontSizeForText(nameInput.value);
+  document.documentElement.style.setProperty('--name-font-size', `${size}px`);
+  nameInput.scrollLeft = 0;
+  return size;
 }
 
 // ── COMPLETE BUTTON ──
@@ -1613,6 +2001,7 @@ document.getElementById('complete-btn').addEventListener('click', () => {
   updateFinalFood('drink', state.drink);
   updateFinalFood('nameSticker', state.nameSticker);
   document.getElementById('ff-name').textContent = getEnteredName();
+  updateNameInputSize();
   applyStageBackground();
 
   // reset animation
@@ -1748,7 +2137,7 @@ async function renderSaveCanvas() {
     ctx.translate(cardX + nameX * cardScale, cardY + nameY * cardScale);
     ctx.rotate(-4 * Math.PI / 180);
     ctx.fillStyle = '#333';
-    ctx.font = `${nameFontSizeForLength(name.length) * cardScale}px "Mantou Sans", "饅頭黑體", sans-serif`;
+    ctx.font = `${nameFontSizeForText(name) * cardScale}px "Mantou Sans", "饅頭黑體", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(name, 0, 0);
