@@ -15,6 +15,13 @@
   }
   @font-face{
     font-family:'LINE Seed TW';
+    src:url('素材/LINE Seed TW_ver02/WOFF2/LINESeedTW_OTF_Bd.woff2') format('woff2');
+    font-weight:700;
+    font-style:normal;
+    font-display:swap;
+  }
+  @font-face{
+    font-family:'LINE Seed TW';
     src:url('素材/LINE Seed TW_ver02/WOFF2/LINESeedTW_OTF_Eb.woff2') format('woff2');
     font-weight:800;
     font-style:normal;
@@ -104,13 +111,13 @@
   }
   #cat-set,
   #cat-main{
-    transform:translate(-8px,12px);
+    transform:translate(-8px,8px);
   }
   #cat-veg,
   #cat-fruit,
   #cat-dessert,
   #cat-drink{
-    transform:translate(-6px,-28px);
+    transform:translate(-6px,2px);
   }
   #menu-panel::-webkit-scrollbar{width:4px;}
   #menu-panel::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px;}
@@ -209,7 +216,9 @@
   .item-card[data-type="veg"] .item-name,
   .item-card[data-type="fruit"] .item-name,
   .item-card[data-type="dessert"] .item-name,
-  .item-card[data-type="drink"] .item-name{
+  .item-card[data-type="drink"] .item-name,
+  .item-card[data-type="set"] .item-name,
+  .item-card[data-type="main"] .item-name{
     text-shadow:0 2px 1px rgba(0,0,0,.10);
   }
   .item-name.title-img{
@@ -232,7 +241,7 @@
   .item-sub{
     font-family:var(--font-body);
     font-size:12px;
-    font-weight:800;
+    font-weight:700;
     color:var(--orange);
     margin-bottom:0;
     line-height:1.65;
@@ -251,12 +260,13 @@
   }
   .item-card[data-type="set"] .item-info,
   .item-card[data-type="main"] .item-info{
-    align-self:end;
+    align-self:start;
+    padding-top:4px;
   }
   .item-card[data-type="set"] .item-sub,
   .item-card[data-type="main"] .item-sub{
-    font-size:9px;
-    line-height:1.45;
+    font-size:17px;
+    line-height:1.18;
   }
   .item-card[data-type="set"] .add-btn,
   .item-card[data-type="main"] .add-btn{
