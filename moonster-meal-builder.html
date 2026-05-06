@@ -15,8 +15,8 @@
   }
   @font-face{
     font-family:'LINE Seed TW';
-    src:url('素材/LINE Seed TW_ver02/WOFF2/LINESeedTW_OTF_Bd.woff2') format('woff2');
-    font-weight:700;
+    src:url('素材/LINE Seed TW_ver02/WOFF2/LINESeedTW_OTF_Eb.woff2') format('woff2');
+    font-weight:800;
     font-style:normal;
     font-display:swap;
   }
@@ -29,13 +29,13 @@
   }
 
   :root{
-    --orange:#FFC56E;
-    --dark-orange:#F5B24F;
+    --orange:#eba63b;
+    --dark-orange:#d8922f;
     --bg-dark:#2a2a2a;
     --card-bg:#ffffff;
     --sidebar-w:62px;
     --menu-w:296px;
-    --font-main:'Mantou Sans','饅頭黑體',sans-serif;
+    --font-main:'LINE Seed TW','PingFang TC','Microsoft JhengHei',sans-serif;
     --font-body:'LINE Seed TW','PingFang TC','Microsoft JhengHei',sans-serif;
   }
 
@@ -80,7 +80,7 @@
     color:#fff;
     font-family:var(--font-main);
     font-size:15px;
-    font-weight:400;
+    font-weight:800;
     letter-spacing:.2em;
     text-indent:.2em;
     cursor:pointer;
@@ -135,10 +135,10 @@
 
   .category-title{
     display:none;
-    font-size:30px;font-weight:400;
+    font-size:30px;font-weight:800;
     color:var(--orange);
     margin-bottom:0;
-    text-shadow:0 4px 8px rgba(255,197,110,.38);
+    text-shadow:0 4px 8px rgba(235,166,59,.38);
   }
 
   .item-card{
@@ -197,11 +197,12 @@
     position:absolute;
     left:8px;
     top:-36px;
+    font-family:var(--font-main);
     font-size:20px;
-    font-weight:400;
+    font-weight:800;
     color:var(--orange);
     margin-bottom:0;
-    text-shadow:0 4px 8px rgba(255,197,110,.38);
+    text-shadow:0 4px 8px rgba(235,166,59,.38);
     white-space:nowrap;
     letter-spacing:.1em;
   }
@@ -212,57 +213,26 @@
     text-shadow:0 2px 1px rgba(0,0,0,.10);
   }
   .item-name.title-img{
-    top:-42px;
+    top:-38px;
     left:4px;
-    height:47px;
+    min-height:38px;
     display:flex;
     align-items:center;
-  }
-  .item-name.title-img img{
-    width:auto;
-    height:100%;
     max-width:270px;
-    object-fit:contain;
-    object-position:left center;
-    display:block;
+    line-height:1.15;
   }
-  .item-name.title-main img{max-width:256px;}
-  .item-card[data-id="set1"] .item-name.title-img img,
-  .item-card[data-id="set2"] .item-name.title-img img{
-    max-width:270px;
+  .item-name.title-set{
+    font-size:18px;
+    letter-spacing:.03em;
   }
-  .item-card[data-id="set3"] .item-name.title-img img,
-  .item-card[data-id="set4"] .item-name.title-img img{
-    height:41px;
-    max-width:246px;
-  }
-  .item-card[data-id="main1"] .item-name.title-img img,
-  .item-card[data-id="main2"] .item-name.title-img img{
-    max-width:256px;
-  }
-  .item-card[data-id="main3"] .item-name.title-img img,
-  .item-card[data-id="main4"] .item-name.title-img img{
-    height:36px;
-    max-width:210px;
-  }
-  .item-card[data-id="veg3"] .item-name.title-img img,
-  .item-card[data-id="veg4"] .item-name.title-img img,
-  .item-card[data-id="fruit3"] .item-name.title-img img,
-  .item-card[data-id="fruit4"] .item-name.title-img img,
-  .item-card[data-id="drk3"] .item-name.title-img img,
-  .item-card[data-id="drk4"] .item-name.title-img img{
-    height:35px;
-    max-width:215px;
-  }
-  .item-card[data-id="des3"] .item-name.title-img img,
-  .item-card[data-id="des4"] .item-name.title-img img{
-    height:34px;
-    max-width:210px;
+  .item-name.title-main{
+    font-size:19px;
+    letter-spacing:.04em;
   }
   .item-sub{
     font-family:var(--font-body);
     font-size:12px;
-    font-weight:700;
+    font-weight:800;
     color:var(--orange);
     margin-bottom:0;
     line-height:1.65;
@@ -370,7 +340,7 @@
     padding:11px 16px;
     font-family:var(--font-main);
     font-size:16px;
-    font-weight:400;
+    font-weight:800;
     letter-spacing:.05em;
     cursor:pointer;
     transition:background .15s,transform .1s;
@@ -554,7 +524,7 @@
     justify-content:center;
     position:relative;
     overflow:hidden;
-    font-size:13px;font-weight:700;color:#999;
+    font-size:13px;font-weight:800;color:#999;
   }
   .tray-breakfast .b-name input{
     position:absolute;
@@ -562,7 +532,7 @@
     border:none;outline:none;
     font-family:var(--font-main);
     font-size:var(--name-font-size, 16px);
-    font-weight:400;
+    font-weight:800;
     color:transparent;
     caret-color:#333;
     width:102px;
@@ -581,6 +551,8 @@
     align-items:center;
     justify-content:center;
     font-size:var(--name-font-size, 16px);
+    font-family:var(--font-main);
+    font-weight:800;
     line-height:22px;
     color:#333;
     letter-spacing:.06em;
@@ -679,7 +651,7 @@
     border-radius:14px;
     padding:10px 24px;
     font-family:var(--font-main);
-    font-size:18px;font-weight:400;
+    font-size:18px;font-weight:800;
     cursor:pointer;
     z-index:20;
     transition:all .2s;
@@ -778,7 +750,8 @@
     color:#333;
     font-size:var(--name-font-size, 16px);
     line-height:22px;
-    font-weight:400;
+    font-family:var(--font-main);
+    font-weight:800;
     text-align:center;
     letter-spacing:.06em;
     z-index:4;
@@ -787,7 +760,8 @@
   #overlay-hint{
     position:relative;z-index:2;
     color:#fff;
-    font-size:15px;font-weight:400;
+    font-family:var(--font-main);
+    font-size:15px;font-weight:800;
     letter-spacing:.06em;
     margin-top:16px;
     opacity:0;
@@ -808,7 +782,7 @@
     border:2px solid #fff;
     color:#fff;
     font-family:var(--font-main);
-    font-size:15px;font-weight:400;
+    font-size:15px;font-weight:800;
     letter-spacing:.06em;
     padding:8px 24px;
     border-radius:10px;
@@ -831,7 +805,7 @@
     border:2px solid #fff;
     color:var(--orange);
     font-family:var(--font-main);
-    font-size:15px;font-weight:400;
+    font-size:15px;font-weight:800;
     letter-spacing:.06em;
     padding:8px 24px;
     border-radius:10px;
@@ -1248,7 +1222,7 @@
     <div class="item-card" data-type="set" data-id="set1">
       <div class="item-img"><img src="素材/Oset.png" alt="寂凸怪蛋吐司套餐" width="116" height="96"></div>
       <div class="item-info">
-        <div class="item-name title-img title-set"><img src="素材/標題名/套餐1.png" alt="01 寂凸怪蛋吐司套餐"></div>
+        <div class="item-name title-img title-set">01 寂凸怪蛋吐司套餐</div>
         <div class="item-sub">主餐：寂凸怪蛋吐司<br>副餐：柳橙／南瓜／香蕉布丁／花草茶</div>
         <div class="item-accessories">
           <img src="素材/O2.png" alt="柳橙">
@@ -1263,7 +1237,7 @@
     <div class="item-card" data-type="set" data-id="set2">
       <div class="item-img"><img src="素材/Pset.png" alt="睏飽寶漢堡包套餐" width="116" height="96"></div>
       <div class="item-info">
-        <div class="item-name title-img title-set"><img src="素材/標題名/套餐2.png" alt="02 睏飽寶漢堡包套餐"></div>
+        <div class="item-name title-img title-set">02 睏飽寶漢堡包套餐</div>
         <div class="item-sub">主餐：睏飽寶漢堡包<br>副餐：櫻桃／甜菜根／能量飲／草莓優格</div>
         <div class="item-accessories">
           <img src="素材/P2.png" alt="櫻桃">
@@ -1278,7 +1252,7 @@
     <div class="item-card" data-type="set" data-id="set3">
       <div class="item-img"><img src="素材/Bset.png" alt="夜魔瞎肉夾饃套餐" width="116" height="96"></div>
       <div class="item-info">
-        <div class="item-name title-img title-set"><img src="素材/標題名/套餐3.png" alt="03 夜魔瞎肉夾饃套餐"></div>
+        <div class="item-name title-img title-set">03 夜魔瞎肉夾饃套餐</div>
         <div class="item-sub">主餐：夜魔瞎肉夾饃<br>副餐：藍莓／茄子／蝶豆花凍／桑椹果醋</div>
         <div class="item-accessories">
           <img src="素材/B2.png" alt="藍莓">
@@ -1293,7 +1267,7 @@
     <div class="item-card" data-type="set" data-id="set4">
       <div class="item-img"><img src="素材/Gset.png" alt="小燒貨大燒餅套餐" width="116" height="96"></div>
       <div class="item-info">
-        <div class="item-name title-img title-set"><img src="素材/標題名/套餐4.png" alt="04 小燒貨大燒餅套餐"></div>
+        <div class="item-name title-img title-set">04 小燒貨大燒餅套餐</div>
         <div class="item-sub">主餐：小燒貨大燒餅<br>副餐：奇異果／苦瓜／綠豆湯／蘆薈汁</div>
         <div class="item-accessories">
           <img src="素材/G2.png" alt="奇異果">
@@ -1313,7 +1287,7 @@
     <div class="item-card" data-type="main" data-id="main1" data-img="素材/O.png" data-alt="寂凸怪蛋吐司">
       <div class="item-img"><img src="素材/O.png" alt="寂凸怪蛋吐司" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img title-main"><img src="素材/標題名/主餐1.png" alt="01 寂凸怪蛋吐司"></div>
+        <div class="item-name title-img title-main">01 寂凸怪蛋吐司</div>
         <div class="item-sub">打擊損害心靈的寂凸怪，讓夜班帶來的孤獨，在進食瞬間得到緩解。</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1322,7 +1296,7 @@
     <div class="item-card" data-type="main" data-id="main2" data-img="素材/P.png" data-alt="睏飽寶漢堡包">
       <div class="item-img"><img src="素材/P.png" alt="睏飽寶漢堡包" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img title-main"><img src="素材/標題名/主餐2.png" alt="02 睏飽寶漢堡包"></div>
+        <div class="item-name title-img title-main">02 睏飽寶漢堡包</div>
         <div class="item-sub">控制導致作息失衡、體力透支的睏飽寶，修復長期累積的慢性疲勞。</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1331,7 +1305,7 @@
     <div class="item-card" data-type="main" data-id="main3" data-img="素材/B.png" data-alt="夜魔瞎肉夾饃">
       <div class="item-img"><img src="素材/B.png" alt="夜魔瞎肉夾饃" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img title-main"><img src="素材/標題名/主餐3.png" alt="03 夜魔瞎肉夾饃"></div>
+        <div class="item-name title-img title-main">03 夜魔瞎肉夾饃</div>
         <div class="item-sub">攻擊針對視線不佳、突發風險的夜魔瞎，為昏暗的夜間路況帶來一絲曙光。</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1340,7 +1314,7 @@
     <div class="item-card" data-type="main" data-id="main4" data-img="素材/G.png" data-alt="小燒貨大燒餅">
       <div class="item-img"><img src="素材/G.png" alt="小燒貨大燒餅" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img title-main"><img src="素材/標題名/主餐4.png" alt="04 小燒貨大燒餅"></div>
+        <div class="item-name title-img title-main">04 小燒貨大燒餅</div>
         <div class="item-sub">收服面對醉酒鬧事等無法預測的小燒貨，讓緊繃的狀態得以平復。</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1354,7 +1328,7 @@
     <div class="item-card" data-type="veg" data-id="veg1" data-img="素材/O1.png" data-alt="南瓜">
       <div class="item-img"><img src="素材/O1.png" alt="南瓜" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/蔬菜1.png" alt="01 南瓜"></div>
+        <div class="item-name title-img">01 南瓜</div>
         <div class="item-sub">穩定血壓、舒緩憂鬱</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1363,7 +1337,7 @@
     <div class="item-card" data-type="veg" data-id="veg2" data-img="素材/P1.png" data-alt="甜菜根">
       <div class="item-img"><img src="素材/P1.png" alt="甜菜根" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/蔬菜2.png" alt="02 甜菜根"></div>
+        <div class="item-name title-img">02 甜菜根</div>
         <div class="item-sub">修復肝臟、促進循環</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1372,7 +1346,7 @@
     <div class="item-card" data-type="veg" data-id="veg3" data-img="素材/B1.png" data-alt="茄子">
       <div class="item-img"><img src="素材/B1.png" alt="茄子" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/蔬菜3.png" alt="03 茄子"></div>
+        <div class="item-name title-img">03 茄子</div>
         <div class="item-sub">保護血管、預防病變</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1381,7 +1355,7 @@
     <div class="item-card" data-type="veg" data-id="veg4" data-img="素材/G1.png" data-alt="苦瓜">
       <div class="item-img"><img src="素材/G1.png" alt="苦瓜" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/蔬菜4.png" alt="04 苦瓜"></div>
+        <div class="item-name title-img">04 苦瓜</div>
         <div class="item-sub">清熱退火、調節血糖</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1395,7 +1369,7 @@
     <div class="item-card" data-type="fruit" data-id="fruit1" data-img="素材/O2.png" data-alt="柳橙">
       <div class="item-img"><img src="素材/O2.png" alt="柳橙" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/水果1.png" alt="01 柳橙"></div>
+        <div class="item-name title-img">01 柳橙</div>
         <div class="item-sub">抑制壓力、提升免疫</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1404,7 +1378,7 @@
     <div class="item-card" data-type="fruit" data-id="fruit2" data-img="素材/P2.png" data-alt="櫻桃">
       <div class="item-img"><img src="素材/P2.png" alt="櫻桃" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/水果2.png" alt="02 櫻桃"></div>
+        <div class="item-name title-img">02 櫻桃</div>
         <div class="item-sub">提升睡眠品質</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1413,7 +1387,7 @@
     <div class="item-card" data-type="fruit" data-id="fruit3" data-img="素材/B2.png" data-alt="藍莓">
       <div class="item-img"><img src="素材/B2.png" alt="藍莓" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/水果3.png" alt="03 藍莓"></div>
+        <div class="item-name title-img">03 藍莓</div>
         <div class="item-sub">修復視網膜、護眼球</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1422,7 +1396,7 @@
     <div class="item-card" data-type="fruit" data-id="fruit4" data-img="素材/G2.png" data-alt="奇異果">
       <div class="item-img"><img src="素材/G2.png" alt="奇異果" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/水果4.png" alt="04 奇異果"></div>
+        <div class="item-name title-img">04 奇異果</div>
         <div class="item-sub">穩定神經、排解怒氣</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1436,7 +1410,7 @@
     <div class="item-card" data-type="dessert" data-id="des1" data-img="素材/O3.png" data-alt="香蕉布丁">
       <div class="item-img"><img src="素材/O3.png" alt="香蕉布丁" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/甜點1.png" alt="01 香蕉布丁"></div>
+        <div class="item-name title-img">01 香蕉布丁</div>
         <div class="item-sub">合成血清素、更快樂</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1445,7 +1419,7 @@
     <div class="item-card" data-type="dessert" data-id="des2" data-img="素材/P3.png" data-alt="草莓優格">
       <div class="item-img"><img src="素材/P3.png" alt="草莓優格" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/甜點2.png" alt="02 草莓優格"></div>
+        <div class="item-name title-img">02 草莓優格</div>
         <div class="item-sub">輕盈飽足、不傷腸胃</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1454,7 +1428,7 @@
     <div class="item-card" data-type="dessert" data-id="des3" data-img="素材/B3.png" data-alt="蝶豆花凍">
       <div class="item-img"><img src="素材/B3.png" alt="蝶豆花凍" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/甜點3.png" alt="03 蝶豆花凍"></div>
+        <div class="item-name title-img">03 蝶豆花凍</div>
         <div class="item-sub">抗氧化、抗藍光傷害</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1463,7 +1437,7 @@
     <div class="item-card" data-type="dessert" data-id="des4" data-img="素材/G3.png" data-alt="綠豆湯">
       <div class="item-img"><img src="素材/G3.png" alt="綠豆湯" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/甜點4.png" alt="04 綠豆湯"></div>
+        <div class="item-name title-img">04 綠豆湯</div>
         <div class="item-sub">消暑解毒、排解燥熱</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1477,7 +1451,7 @@
     <div class="item-card" data-type="drink" data-id="drk1" data-img="素材/O4.png" data-alt="花草茶">
       <div class="item-img"><img src="素材/O4.png" alt="花草茶" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/飲料1.png" alt="01 花草茶"></div>
+        <div class="item-name title-img">01 花草茶</div>
         <div class="item-sub">安神助眠、緩解焦慮</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1486,7 +1460,7 @@
     <div class="item-card" data-type="drink" data-id="drk2" data-img="素材/P4.png" data-alt="能量飲">
       <div class="item-img"><img src="素材/P4.png" alt="能量飲" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/飲料2.png" alt="02 能量飲"></div>
+        <div class="item-name title-img">02 能量飲</div>
         <div class="item-sub">消除疲勞、提升專注</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1495,7 +1469,7 @@
     <div class="item-card" data-type="drink" data-id="drk3" data-img="素材/B4.png" data-alt="桑椹果醋">
       <div class="item-img"><img src="素材/B4.png" alt="桑椹果醋" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/飲料3.png" alt="03 桑椹果醋"></div>
+        <div class="item-name title-img">03 桑椹果醋</div>
         <div class="item-sub">改善循環、緩解疲勞</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1504,7 +1478,7 @@
     <div class="item-card" data-type="drink" data-id="drk4" data-img="素材/G4.png" data-alt="蘆薈汁">
       <div class="item-img"><img src="素材/G4.png" alt="蘆薈汁" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img"><img src="素材/副餐名/飲料4.png" alt="04 蘆薈汁"></div>
+        <div class="item-name title-img">04 蘆薈汁</div>
         <div class="item-sub">迅速降火、利尿排毒</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1666,7 +1640,7 @@
 // ── STATE ──
 const state = {
   main: null, veg: null, fruit: null, dessert: null, drink: null, nameSticker: null,
-  bg: '#FFC56E',
+  bg: '#eba63b',
   bgImg: null,
   positions: {},
   z: {},
@@ -1999,7 +1973,7 @@ function getEnteredName() {
 function measuredNameWidth(text, size) {
   if (!text) return 0;
   const chars = Array.from(text);
-  nameMeasureContext.font = `${size}px "Mantou Sans", "饅頭黑體", sans-serif`;
+  nameMeasureContext.font = `800 ${size}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
   return nameMeasureContext.measureText(text).width + Math.max(0, chars.length - 1) * size * 0.06;
 }
 
@@ -2141,7 +2115,7 @@ async function renderSaveCanvas() {
     const bg = await loadCanvasImage(state.bgImg);
     drawCoverImage(ctx, bg, 0, 0, saveCanvasSize.width, saveCanvasSize.height);
   } else {
-    ctx.fillStyle = state.bg || '#FFC56E';
+    ctx.fillStyle = state.bg || '#eba63b';
     ctx.fillRect(0, 0, saveCanvasSize.width, saveCanvasSize.height);
   }
 
@@ -2169,7 +2143,7 @@ async function renderSaveCanvas() {
     ctx.translate(cardX + nameX * cardScale, cardY + nameY * cardScale);
     ctx.rotate(-4 * Math.PI / 180);
     ctx.fillStyle = '#333';
-    ctx.font = `${nameFontSizeForText(name) * cardScale}px "Mantou Sans", "饅頭黑體", sans-serif`;
+    ctx.font = `800 ${nameFontSizeForText(name) * cardScale}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(name, 0, 0);
