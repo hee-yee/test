@@ -40,8 +40,9 @@
     --dark-orange:#d8922f;
     --bg-dark:#2a2a2a;
     --card-bg:#ffffff;
-    --sidebar-w:62px;
+    --sidebar-w:66px;
     --menu-w:296px;
+    --name-label-w:82px;
     --font-main:'LINE Seed TW','PingFang TC','Microsoft JhengHei',sans-serif;
     --font-body:'LINE Seed TW','PingFang TC','Microsoft JhengHei',sans-serif;
   }
@@ -80,7 +81,7 @@
   }
   #sidebar .logo img{width:46px;height:46px;display:block;object-fit:contain;}
   .nav-btn{
-    width:48px;height:30px;
+    width:52px;height:30px;
     background:transparent;
     border:3px solid #fff;
     border-radius:10px;
@@ -111,7 +112,7 @@
   }
   #cat-set,
   #cat-main{
-    transform:translate(-8px,5px);
+    transform:translate(-8px,4px);
   }
   #cat-veg,
   #cat-fruit,
@@ -513,7 +514,7 @@
   /* BREAKFAST label */
   .tray-breakfast{
     position:absolute;
-    right:155px;bottom:60px;
+    right:149px;bottom:60px;
     transform:rotate(-4deg);
     display:flex;align-items:center;gap:8px;
     z-index:9;
@@ -530,7 +531,7 @@
     background:transparent;
     border-radius:0;
     padding:0;
-    width:102px;
+    width:var(--name-label-w);
     height:22px;
     display:flex;
     align-items:center;
@@ -548,7 +549,7 @@
     font-weight:800;
     color:transparent;
     caret-color:#333;
-    width:102px;
+    width:100%;
     height:22px;
     line-height:22px;
     padding:0;
@@ -753,12 +754,13 @@
   #ff-drink{width:67px;height:67px;}
   #ff-name{
     position:absolute;
-    right:155px;bottom:60px;
-    width:102px;
+    right:149px;bottom:60px;
+    width:var(--name-label-w);
     height:22px;
     display:flex;
     align-items:center;
     justify-content:center;
+    overflow:hidden;
     transform:rotate(-4deg);
     color:#333;
     font-size:var(--name-font-size, 16px);
@@ -855,7 +857,7 @@
 
   @media (min-width:768px) and (max-width:1180px){
     :root{
-      --sidebar-w:58px;
+      --sidebar-w:62px;
       --menu-w:270px;
     }
 
@@ -1672,7 +1674,7 @@ const slotDefaults = {
 const foodTypes = ['main', 'veg', 'fruit', 'dessert', 'drink', 'nameSticker'];
 const saveCanvasSize = { width: 360, height: 640 };
 const saveScale = 3;
-const nameLabel = { right: 155, bottom: 60, width: 102, fontSize: 16, minFontSize: 7, lineHeight: 19 };
+const nameLabel = { right: 149, bottom: 60, width: 82, fontSize: 16, minFontSize: 5.5, lineHeight: 22 };
 const dragBounds = { left: 48, top: 48, right: 48, bottom: 54 };
 const stickerDir = '素材/貼紙/';
 const mealBaseSize = { width: 560, height: 448, trayHeight: 393 };
@@ -1863,11 +1865,22 @@ function resetSlotLayout() {
   state.topZ = 8 + foodTypes.length;
 }
 
+function displaySizeForItem(type, item) {
+  const base = slotDefaults[type];
+  if (!base) return { w: 80, h: 80 };
+  if (type === "veg" && item && item.src && item.src.endsWith("P1.png")) return { w: 84, h: 84 };
+  if (type === "fruit" && item) return { w: 56, h: 56 };
+  return { w: base.w, h: base.h };
+}
+
 function applySlotLayout(type) {
   const slot = document.getElementById(slotId(type));
   const pos = state.positions[type] || slotDefaults[type];
-  slot.style.setProperty('--slot-x', `${pos.x}px`);
-  slot.style.setProperty('--slot-y', `${pos.y}px`);
+  const size = displaySizeForItem(type, state[type]);
+  slot.style.width = size.w + "px";
+  slot.style.height = size.h + "px";
+  slot.style.setProperty("--slot-x", pos.x + "px");
+  slot.style.setProperty("--slot-y", pos.y + "px");
   slot.style.zIndex = state.z[type] || 8;
 }
 
@@ -2044,8 +2057,11 @@ function updateFinalFood(type, item) {
 function applyFinalFoodLayout(type) {
   const slot = document.getElementById(finalSlotId(type));
   const pos = state.positions[type] || slotDefaults[type];
-  slot.style.left = `${pos.x}px`;
-  slot.style.top = `${pos.y}px`;
+  const size = displaySizeForItem(type, state[type]);
+  slot.style.left = pos.x + "px";
+  slot.style.top = pos.y + "px";
+  slot.style.width = size.w + "px";
+  slot.style.height = size.h + "px";
   slot.style.zIndex = state.z[type] || 8;
 }
 
@@ -2376,8 +2392,8 @@ function drawCanvasFoodsSync(ctx, cardX, cardY, cardScale) {
 async function drawCanvasFoodAtPosition(ctx, type, cardX, cardY, cardScale) {
   const item = state[type];
   if (!item) return;
-  const size = slotDefaults[type];
-  const pos = state.positions[type] || size;
+  const size = displaySizeForItem(type, item);
+  const pos = state.positions[type] || slotDefaults[type];
   await drawCanvasFood(
     ctx,
     item,
@@ -2391,8 +2407,8 @@ async function drawCanvasFoodAtPosition(ctx, type, cardX, cardY, cardScale) {
 function drawCanvasFoodAtPositionSync(ctx, type, cardX, cardY, cardScale) {
   const item = state[type];
   if (!item) return;
-  const size = slotDefaults[type];
-  const pos = state.positions[type] || size;
+  const size = displaySizeForItem(type, item);
+  const pos = state.positions[type] || slotDefaults[type];
   drawCanvasFoodSync(
     ctx,
     item,
