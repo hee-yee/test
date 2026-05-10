@@ -351,27 +351,19 @@
     height:100%;
     min-height:190px;
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap:10px;
     background:#fff6e6;
     color:var(--orange);
     border:3px dashed rgba(235,166,59,.7);
+    font-family:var(--font-main);
+    font-size:20px;
     font-weight:800;
-    letter-spacing:.04em;
+    letter-spacing:.1em;
+    text-shadow:0 2px 1px rgba(0,0,0,.10);
   }
   .upload-bg-visual::before{
-    content:"+";
-    width:48px;
-    height:48px;
-    border-radius:50%;
-    border:3px solid var(--orange);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:36px;
-    line-height:1;
+    content:none;
   }
   .bg-grid{
     display:grid;
@@ -415,6 +407,20 @@
     background-size:cover;
     background-position:center;
     transition:background .4s;
+    overflow:hidden;
+  }
+
+  #stage-bg-img,
+  #overlay-bg-img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:none;
+    pointer-events:none;
+    transform-origin:center;
+    will-change:transform;
   }
 
   /* star pattern */
@@ -425,6 +431,11 @@
     background-size:48px 48px;
     pointer-events:none;
     opacity:.5;
+    z-index:1;
+  }
+
+  #meal-card{
+    z-index:2;
   }
 
   /* ── MEAL CARD (tray) ── */
@@ -708,6 +719,43 @@
   #complete-btn:hover{background:var(--orange);color:#fff;transform:translateY(-2px);}
   #complete-btn:active{transform:scale(0.95);}
 
+  #bg-adjust-panel{
+    position:absolute;
+    left:22px;
+    bottom:22px;
+    z-index:21;
+    width:min(260px, calc(100% - 190px));
+    display:none;
+    gap:10px;
+    flex-direction:column;
+    padding:12px 14px;
+    background:rgba(255,255,255,.92);
+    border:2px solid rgba(235,166,59,.6);
+    border-radius:12px;
+    box-shadow:0 6px 18px rgba(0,0,0,.14);
+    color:var(--orange);
+    font-family:var(--font-main);
+    font-weight:800;
+  }
+  #bg-adjust-panel.show{display:flex;}
+  .bg-adjust-row{
+    display:grid;
+    grid-template-columns:42px minmax(0,1fr) 44px;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    letter-spacing:.04em;
+  }
+  .bg-adjust-row input{
+    width:100%;
+    accent-color:var(--orange);
+  }
+  .bg-adjust-value{
+    text-align:right;
+    color:#7a5b25;
+    font-size:12px;
+  }
+
   /* ── COMPLETION OVERLAY ── */
   #overlay{
     display:none;
@@ -727,6 +775,7 @@
     background:var(--orange);
     opacity:.95;
     transition:background .4s;
+    overflow:hidden;
   }
 
   #anim-card{
@@ -1204,6 +1253,29 @@
       height:144px;
     }
 
+    .upload-bg-visual{
+      font-size:20px;
+    }
+
+    #bg-adjust-panel{
+      left:12px;
+      bottom:62px;
+      width:min(220px, calc(100% - 24px));
+      padding:9px 10px;
+      gap:7px;
+      border-radius:10px;
+    }
+
+    .bg-adjust-row{
+      grid-template-columns:38px minmax(0,1fr) 38px;
+      gap:6px;
+      font-size:12px;
+    }
+
+    .bg-adjust-value{
+      font-size:11px;
+    }
+
     #complete-btn{
       right:14px;
       bottom:14px;
@@ -1583,7 +1655,7 @@
     <div class="bg-grid">
       <div class="item-card" data-type="bg-upload" data-id="bg-upload">
         <div class="item-img">
-          <div class="upload-bg-visual">自行上傳圖片</div>
+          <div class="upload-bg-visual">上傳圖片</div>
         </div>
         <div class="item-info"></div><button class="add-btn">選擇</button>
       </div>
@@ -1658,6 +1730,7 @@
 
 <!-- ── RIGHT STAGE ── -->
 <div id="stage">
+  <img id="stage-bg-img" alt="" aria-hidden="true">
 
   <!-- MEAL CARD -->
   <div id="meal-card">
@@ -1709,11 +1782,23 @@
   </div>
 
   <button id="complete-btn">製作完成 ✨</button>
+  <div id="bg-adjust-panel" aria-label="調整上傳背景">
+    <label class="bg-adjust-row">
+      <span>大小</span>
+      <input id="bg-scale-input" type="range" min="1" max="2.5" step="0.01" value="1">
+      <span class="bg-adjust-value" id="bg-scale-value">100%</span>
+    </label>
+    <label class="bg-adjust-row">
+      <span>角度</span>
+      <input id="bg-rotate-input" type="range" min="-180" max="180" step="1" value="0">
+      <span class="bg-adjust-value" id="bg-rotate-value">0°</span>
+    </label>
+  </div>
 </div>
 
 <!-- ── COMPLETION OVERLAY ── -->
 <div id="overlay">
-  <div id="overlay-bg"></div>
+  <div id="overlay-bg"><img id="overlay-bg-img" alt="" aria-hidden="true"></div>
   <div id="anim-card">
     <div class="final-card" id="final-card">
       <div class="final-food" id="ff-main"></div>
@@ -1741,6 +1826,9 @@ const state = {
   main: null, veg: null, fruit: null, dessert: null, drink: null, nameSticker: null,
   bg: '#eba63b',
   bgImg: null,
+  bgUploaded: false,
+  bgScale: 1,
+  bgRotate: 0,
   positions: {},
   z: {},
   topZ: 8
@@ -1833,6 +1921,11 @@ window.addEventListener('orientationchange', updateResponsiveScale);
 // ── NAV ──
 const noScrollCats = ['set', 'main', 'veg', 'fruit', 'dessert', 'drink'];
 const menuPanel = document.getElementById('menu-panel');
+const bgScaleInput = document.getElementById('bg-scale-input');
+const bgRotateInput = document.getElementById('bg-rotate-input');
+const bgScaleValue = document.getElementById('bg-scale-value');
+const bgRotateValue = document.getElementById('bg-rotate-value');
+const bgAdjustPanel = document.getElementById('bg-adjust-panel');
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1849,6 +1942,20 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 
 const activeNavButton = document.querySelector('.nav-btn.active');
 menuPanel.classList.toggle('bg-menu-active', activeNavButton && activeNavButton.dataset.cat === 'bg');
+
+bgScaleInput.addEventListener('input', () => {
+  state.bgScale = Number(bgScaleInput.value);
+  applyUploadedBackgroundTransform();
+  updateBgAdjustValues();
+  markDesignDirty();
+});
+
+bgRotateInput.addEventListener('input', () => {
+  state.bgRotate = Number(bgRotateInput.value);
+  applyUploadedBackgroundTransform();
+  updateBgAdjustValues();
+  markDesignDirty();
+});
 
 // ── ADD BUTTONS ──
 document.querySelectorAll('.add-btn').forEach(btn => {
@@ -1890,7 +1997,10 @@ function addItem(card) {
     updateSlot('nameSticker', state.nameSticker);
 
   } else if (type === 'bg') {
+    clearUploadedBackgroundObjectUrl();
     state.bgImg = card.dataset.img;
+    state.bgUploaded = false;
+    resetUploadedBackgroundTransform();
     applyStageBackground();
 
   } else {
@@ -1919,21 +2029,41 @@ function addItem(card) {
 document.getElementById('bg-upload-input').addEventListener('change', e => {
   const file = e.target.files && e.target.files[0];
   if (!file || !file.type.startsWith('image/')) return;
-  if (uploadedBgObjectUrl) {
-    imageCache.delete(uploadedBgObjectUrl);
-    URL.revokeObjectURL(uploadedBgObjectUrl);
-  }
+  clearUploadedBackgroundObjectUrl();
   uploadedBgObjectUrl = URL.createObjectURL(file);
   state.bgImg = uploadedBgObjectUrl;
+  state.bgUploaded = true;
+  resetUploadedBackgroundTransform();
   applyStageBackground();
   markDesignDirty();
   e.target.value = '';
 });
 
+function clearUploadedBackgroundObjectUrl() {
+  if (!uploadedBgObjectUrl) return;
+  imageCache.delete(uploadedBgObjectUrl);
+  URL.revokeObjectURL(uploadedBgObjectUrl);
+  uploadedBgObjectUrl = null;
+}
+
 function applyStageBackground() {
   const stage = document.getElementById('stage');
   const overlayBg = document.getElementById('overlay-bg');
-  if (state.bgImg) {
+  const stageBgImg = document.getElementById('stage-bg-img');
+  const overlayBgImg = document.getElementById('overlay-bg-img');
+  if (state.bgImg && state.bgUploaded) {
+    stage.style.backgroundColor = state.bg;
+    stage.style.backgroundImage = 'none';
+    overlayBg.style.backgroundColor = state.bg;
+    overlayBg.style.backgroundImage = 'none';
+    stageBgImg.src = state.bgImg;
+    overlayBgImg.src = state.bgImg;
+    stageBgImg.style.display = 'block';
+    overlayBgImg.style.display = 'block';
+    bgAdjustPanel.classList.add('show');
+    applyUploadedBackgroundTransform();
+    updateBgAdjustValues();
+  } else if (state.bgImg) {
     stage.style.backgroundColor = state.bg;
     stage.style.backgroundImage = `url("${state.bgImg}")`;
     stage.style.backgroundSize = 'cover';
@@ -1942,12 +2072,41 @@ function applyStageBackground() {
     overlayBg.style.backgroundImage = `url("${state.bgImg}")`;
     overlayBg.style.backgroundSize = 'cover';
     overlayBg.style.backgroundPosition = 'center';
+    stageBgImg.style.display = 'none';
+    overlayBgImg.style.display = 'none';
+    stageBgImg.removeAttribute('src');
+    overlayBgImg.removeAttribute('src');
+    bgAdjustPanel.classList.remove('show');
   } else {
     stage.style.backgroundColor = state.bg;
     stage.style.backgroundImage = 'none';
     overlayBg.style.backgroundColor = state.bg;
     overlayBg.style.backgroundImage = 'none';
+    stageBgImg.style.display = 'none';
+    overlayBgImg.style.display = 'none';
+    stageBgImg.removeAttribute('src');
+    overlayBgImg.removeAttribute('src');
+    bgAdjustPanel.classList.remove('show');
   }
+}
+
+function resetUploadedBackgroundTransform() {
+  state.bgScale = 1;
+  state.bgRotate = 0;
+  bgScaleInput.value = state.bgScale;
+  bgRotateInput.value = state.bgRotate;
+  updateBgAdjustValues();
+}
+
+function applyUploadedBackgroundTransform() {
+  const transform = `scale(${state.bgScale}) rotate(${state.bgRotate}deg)`;
+  document.getElementById('stage-bg-img').style.transform = transform;
+  document.getElementById('overlay-bg-img').style.transform = transform;
+}
+
+function updateBgAdjustValues() {
+  bgScaleValue.textContent = `${Math.round(state.bgScale * 100)}%`;
+  bgRotateValue.textContent = `${Math.round(state.bgRotate)}°`;
 }
 
 function updateSlot(type, item) {
@@ -2226,7 +2385,7 @@ async function saveCardNow() {
     const result = await downloadCanvas(canvas, 'monster-meal.png');
     const messages = {
       picked: saveSuccessMessage,
-      shared: '請在系統選單中選擇儲存圖片',
+      shared: saveSuccessMessage,
       opened: '圖片已開啟，請長按或右鍵儲存',
       downloaded: saveSuccessMessage
     };
@@ -2260,7 +2419,11 @@ async function renderSaveCanvas() {
 
   if (state.bgImg) {
     const bg = await loadCanvasImage(state.bgImg);
-    drawCoverImage(ctx, bg, 0, 0, saveCanvasSize.width, saveCanvasSize.height);
+    if (state.bgUploaded) {
+      drawTransformedCoverImage(ctx, bg, 0, 0, saveCanvasSize.width, saveCanvasSize.height, state.bgScale, state.bgRotate);
+    } else {
+      drawCoverImage(ctx, bg, 0, 0, saveCanvasSize.width, saveCanvasSize.height);
+    }
   } else {
     ctx.fillStyle = state.bg || '#eba63b';
     ctx.fillRect(0, 0, saveCanvasSize.width, saveCanvasSize.height);
@@ -2477,6 +2640,18 @@ function drawCoverImage(ctx, img, x, y, w, h) {
   const sx = (img.width - sw) / 2;
   const sy = (img.height - sh) / 2;
   ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+}
+
+function drawTransformedCoverImage(ctx, img, x, y, w, h, scaleFactor, rotateDeg) {
+  const coverScale = Math.max(w / img.width, h / img.height);
+  const drawW = img.width * coverScale;
+  const drawH = img.height * coverScale;
+  ctx.save();
+  ctx.translate(x + w / 2, y + h / 2);
+  ctx.rotate(rotateDeg * Math.PI / 180);
+  ctx.scale(scaleFactor, scaleFactor);
+  ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+  ctx.restore();
 }
 
 async function drawCanvasFood(ctx, item, x, y, w, h) {
