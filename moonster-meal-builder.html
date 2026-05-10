@@ -927,9 +927,9 @@
       justify-content:flex-start;
       gap:10px;
       padding:10px 12px;
-      overflow-x:auto;
+      background:#fff;
+      overflow:hidden;
       overflow-y:hidden;
-      -webkit-overflow-scrolling:touch;
     }
 
     #sidebar::-webkit-scrollbar,
@@ -942,6 +942,10 @@
       height:42px;
       margin:0 4px 0 0;
       flex:0 0 auto;
+      position:sticky;
+      left:12px;
+      z-index:2;
+      background:#fff;
     }
 
     #sidebar .logo img{
@@ -955,11 +959,30 @@
       height:36px;
       padding:0 10px;
       flex:0 0 auto;
+      background:#fff;
+      color:var(--orange);
+      border-color:var(--orange);
       border-width:2px;
       border-radius:9px;
       font-size:14px;
       letter-spacing:.08em;
       text-indent:.08em;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active{
+      background:var(--orange);
+      color:#fff;
+    }
+
+    #sidebar .nav-btn:first-of-type{
+      margin-left:4px;
+    }
+
+    #sidebar{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
     }
 
     #stage{
@@ -981,7 +1004,7 @@
       flex:0 0 238px;
       border-right:0;
       border-top:2px solid #f0f0f0;
-      padding:48px 16px 20px;
+      padding:58px 16px 28px;
       overflow-x:auto;
       overflow-y:hidden;
       -webkit-overflow-scrolling:touch;
@@ -990,8 +1013,8 @@
     #menu-panel.no-scroll{
       overflow-x:auto;
       overflow-y:hidden;
-      padding-top:48px;
-      padding-bottom:20px;
+      padding-top:58px;
+      padding-bottom:28px;
     }
 
     #cat-set,
@@ -1003,19 +1026,9 @@
       transform:none;
     }
 
-    #cat-set,
-    #cat-main{
-      transform:translateY(18px);
-    }
-
-    #cat-veg,
-    #cat-fruit,
-    #cat-dessert,
-    #cat-drink{
-      transform:translateY(-18px);
-    }
-
     .menu-category.active,
+    #cat-set.active,
+    #cat-main.active,
     #cat-veg.active,
     #cat-fruit.active,
     #cat-dessert.active,
@@ -1025,7 +1038,7 @@
       width:max-content;
       display:flex;
       flex-direction:row;
-      align-items:flex-start;
+      align-items:center;
       justify-content:flex-start;
       gap:18px;
     }
@@ -1190,11 +1203,13 @@
     #menu-panel{
       height:220px;
       flex-basis:220px;
-      padding-top:44px;
+      padding-top:54px;
+      padding-bottom:24px;
     }
 
     #menu-panel.no-scroll{
-      padding-top:44px;
+      padding-top:54px;
+      padding-bottom:24px;
     }
 
     .item-card,
