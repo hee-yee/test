@@ -759,14 +759,18 @@
     border:2px solid var(--orange);
     background:#fff;
     color:var(--orange);
-    border-radius:8px;
-    padding:4px 7px;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    padding:0;
     font-family:var(--font-main);
-    font-size:12px;
+    font-size:18px;
     font-weight:800;
     cursor:pointer;
     line-height:1;
-    white-space:nowrap;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
   .bg-reset-btn:active{transform:scale(.96);}
 
@@ -1291,9 +1295,9 @@
     }
 
     .bg-reset-btn{
-      padding:4px 6px;
-      font-size:11px;
-      border-radius:7px;
+      width:26px;
+      height:26px;
+      font-size:17px;
     }
 
     #complete-btn{
@@ -1807,13 +1811,13 @@
       <span>大小</span>
       <input id="bg-scale-input" type="range" min="1" max="2.5" step="0.01" value="1">
       <span class="bg-adjust-value" id="bg-scale-value">100%</span>
-      <button class="bg-reset-btn" id="bg-scale-reset" type="button">復原</button>
+      <button class="bg-reset-btn" id="bg-scale-reset" type="button" aria-label="復原圖片大小">↺</button>
     </label>
     <label class="bg-adjust-row">
       <span>角度</span>
       <input id="bg-rotate-input" type="range" min="-180" max="180" step="1" value="0">
       <span class="bg-adjust-value" id="bg-rotate-value">0°</span>
-      <button class="bg-reset-btn" id="bg-rotate-reset" type="button">復原</button>
+      <button class="bg-reset-btn" id="bg-rotate-reset" type="button" aria-label="復原旋轉角度">↺</button>
     </label>
   </div>
 </div>
