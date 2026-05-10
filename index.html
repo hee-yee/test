@@ -740,7 +740,7 @@
   #bg-adjust-panel.show{display:flex;}
   .bg-adjust-row{
     display:grid;
-    grid-template-columns:42px minmax(0,1fr) 44px;
+    grid-template-columns:42px minmax(0,1fr) 44px auto;
     align-items:center;
     gap:8px;
     font-size:13px;
@@ -755,6 +755,20 @@
     color:#7a5b25;
     font-size:12px;
   }
+  .bg-reset-btn{
+    border:2px solid var(--orange);
+    background:#fff;
+    color:var(--orange);
+    border-radius:8px;
+    padding:4px 7px;
+    font-family:var(--font-main);
+    font-size:12px;
+    font-weight:800;
+    cursor:pointer;
+    line-height:1;
+    white-space:nowrap;
+  }
+  .bg-reset-btn:active{transform:scale(.96);}
 
   /* ── COMPLETION OVERLAY ── */
   #overlay{
@@ -1259,7 +1273,7 @@
 
     #bg-adjust-panel{
       left:12px;
-      bottom:62px;
+      bottom:14px;
       width:min(220px, calc(100% - 24px));
       padding:9px 10px;
       gap:7px;
@@ -1267,13 +1281,19 @@
     }
 
     .bg-adjust-row{
-      grid-template-columns:38px minmax(0,1fr) 38px;
+      grid-template-columns:38px minmax(0,1fr) 38px auto;
       gap:6px;
       font-size:12px;
     }
 
     .bg-adjust-value{
       font-size:11px;
+    }
+
+    .bg-reset-btn{
+      padding:4px 6px;
+      font-size:11px;
+      border-radius:7px;
     }
 
     #complete-btn{
@@ -1432,12 +1452,12 @@
       <div class="item-img"><img src="素材/Gset.png" alt="小燒貨大燒餅套餐" width="116" height="96"></div>
       <div class="item-info">
         <div class="item-name title-img title-set">04 小燒貨大燒餅套餐</div>
-        <div class="item-sub">小燒貨大燒餅<br>奇異果／苦瓜／綠豆湯／蘆薈汁</div>
+        <div class="item-sub">小燒貨大燒餅<br>奇異果／苦瓜／綠豆湯／蘆筍汁</div>
         <div class="item-accessories">
           <img src="素材/G2.png" alt="奇異果">
           <img src="素材/G1.png" alt="苦瓜">
           <img src="素材/G3.png" alt="綠豆湯">
-          <img src="素材/G4.png" alt="蘆薈汁">
+          <img src="素材/G4.png" alt="蘆筍汁">
         </div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1639,10 +1659,10 @@
       <button class="add-btn">加入購物車</button>
     </div>
 
-    <div class="item-card" data-type="drink" data-id="drk4" data-img="素材/G4.png" data-alt="蘆薈汁">
-      <div class="item-img"><img src="素材/G4.png" alt="蘆薈汁" width="80" height="80"></div>
+    <div class="item-card" data-type="drink" data-id="drk4" data-img="素材/G4.png" data-alt="蘆筍汁">
+      <div class="item-img"><img src="素材/G4.png" alt="蘆筍汁" width="80" height="80"></div>
       <div class="item-info">
-        <div class="item-name title-img">04 蘆薈汁</div>
+        <div class="item-name title-img">04 蘆筍汁</div>
         <div class="item-sub">迅速降火、利尿排毒</div>
       </div>
       <button class="add-btn">加入購物車</button>
@@ -1787,11 +1807,13 @@
       <span>大小</span>
       <input id="bg-scale-input" type="range" min="1" max="2.5" step="0.01" value="1">
       <span class="bg-adjust-value" id="bg-scale-value">100%</span>
+      <button class="bg-reset-btn" id="bg-scale-reset" type="button">復原</button>
     </label>
     <label class="bg-adjust-row">
       <span>角度</span>
       <input id="bg-rotate-input" type="range" min="-180" max="180" step="1" value="0">
       <span class="bg-adjust-value" id="bg-rotate-value">0°</span>
+      <button class="bg-reset-btn" id="bg-rotate-reset" type="button">復原</button>
     </label>
   </div>
 </div>
@@ -1884,7 +1906,7 @@ const setPresets = {
     veg: foodImage('素材/G1.png', '苦瓜'),
     fruit: foodImage('素材/G2.png', '奇異果'),
     dessert: foodImage('素材/G3.png', '綠豆湯'),
-    drink: foodImage('素材/G4.png', '蘆薈汁'),
+    drink: foodImage('素材/G4.png', '蘆筍汁'),
     nameSticker: nameStickerImage('G')
   },
 };
@@ -1926,6 +1948,8 @@ const bgRotateInput = document.getElementById('bg-rotate-input');
 const bgScaleValue = document.getElementById('bg-scale-value');
 const bgRotateValue = document.getElementById('bg-rotate-value');
 const bgAdjustPanel = document.getElementById('bg-adjust-panel');
+const bgScaleReset = document.getElementById('bg-scale-reset');
+const bgRotateReset = document.getElementById('bg-rotate-reset');
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1952,6 +1976,26 @@ bgScaleInput.addEventListener('input', () => {
 
 bgRotateInput.addEventListener('input', () => {
   state.bgRotate = Number(bgRotateInput.value);
+  applyUploadedBackgroundTransform();
+  updateBgAdjustValues();
+  markDesignDirty();
+});
+
+bgScaleReset.addEventListener('click', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  state.bgScale = 1;
+  bgScaleInput.value = state.bgScale;
+  applyUploadedBackgroundTransform();
+  updateBgAdjustValues();
+  markDesignDirty();
+});
+
+bgRotateReset.addEventListener('click', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  state.bgRotate = 0;
+  bgRotateInput.value = state.bgRotate;
   applyUploadedBackgroundTransform();
   updateBgAdjustValues();
   markDesignDirty();
