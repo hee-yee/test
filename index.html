@@ -318,7 +318,8 @@
   .item-card[data-id="fruit4"] .item-img img{transform:scale(.78);}
   .item-card[data-id="veg2"] .item-img img{transform:scale(1.16);}
   .item-card[data-type="set"] .item-accessories{display:none;}
-  .item-card[data-type="bg"]{
+  .item-card[data-type="bg"],
+  .item-card[data-type="bg-upload"]{
     padding:0;
     min-height:190px;
     margin:0;
@@ -327,8 +328,10 @@
     border-radius:20px;
     display:block;
   }
-  .item-card[data-type="bg"] .item-img{grid-column:auto;grid-row:auto;}
-  .item-card[data-type="bg"] .item-img{
+  .item-card[data-type="bg"] .item-img,
+  .item-card[data-type="bg-upload"] .item-img{grid-column:auto;grid-row:auto;}
+  .item-card[data-type="bg"] .item-img,
+  .item-card[data-type="bg-upload"] .item-img{
     width:100%;
     height:100%;
     min-height:190px;
@@ -340,7 +343,36 @@
     object-fit:cover;
   }
   .item-card[data-type="bg"] .item-info,
-  .item-card[data-type="bg"] .add-btn{display:none;}
+  .item-card[data-type="bg"] .add-btn,
+  .item-card[data-type="bg-upload"] .item-info,
+  .item-card[data-type="bg-upload"] .add-btn{display:none;}
+  .upload-bg-visual{
+    width:100%;
+    height:100%;
+    min-height:190px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    background:#fff6e6;
+    color:var(--orange);
+    border:3px dashed rgba(235,166,59,.7);
+    font-weight:800;
+    letter-spacing:.04em;
+  }
+  .upload-bg-visual::before{
+    content:"+";
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    border:3px solid var(--orange);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+    line-height:1;
+  }
   .bg-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -1151,7 +1183,13 @@
       gap:14px;
     }
 
-    .item-card[data-type="bg"]{
+    #menu-panel.bg-menu-active{
+      padding-top:18px;
+      padding-bottom:8px;
+    }
+
+    .item-card[data-type="bg"],
+    .item-card[data-type="bg-upload"]{
       width:144px;
       height:144px;
       min-height:0;
@@ -1159,7 +1197,9 @@
       border-radius:16px;
     }
 
-    .item-card[data-type="bg"] .item-img{
+    .item-card[data-type="bg"] .item-img,
+    .item-card[data-type="bg-upload"] .item-img,
+    .upload-bg-visual{
       min-height:0;
       height:144px;
     }
@@ -1225,6 +1265,11 @@
     #menu-panel.no-scroll{
       padding-top:47px;
       padding-bottom:9px;
+    }
+
+    #menu-panel.bg-menu-active{
+      padding-top:16px;
+      padding-bottom:8px;
     }
 
     .item-card,
@@ -1536,6 +1581,12 @@
   <div class="menu-category" id="cat-bg">
     <div class="category-title">背景</div>
     <div class="bg-grid">
+      <div class="item-card" data-type="bg-upload" data-id="bg-upload">
+        <div class="item-img">
+          <div class="upload-bg-visual">自行上傳圖片</div>
+        </div>
+        <div class="item-info"></div><button class="add-btn">選擇</button>
+      </div>
       <div class="item-card" data-type="bg" data-id="bg01" data-img="素材/背景-web/01.jpg">
         <div class="item-img"><img src="素材/背景-thumb/01.jpg" alt="背景 01" loading="eager" decoding="async"></div>
         <div class="item-info"></div><button class="add-btn">選擇</button>
@@ -1682,6 +1733,7 @@
 </div>
 
 <canvas id="save-canvas" width="1080" height="1920"></canvas>
+<input id="bg-upload-input" type="file" accept="image/*" hidden>
 
 <script>
 // ── STATE ──
@@ -1771,6 +1823,8 @@ const imageCache = new Map();
 const preloadAssets = [
   '素材/小卡-web.png'
 ];
+let uploadedBgObjectUrl = null;
+let isSavedCurrentDesign = false;
 preloadAssets.forEach(preloadImage);
 updateResponsiveScale();
 window.addEventListener('resize', updateResponsiveScale);
@@ -1787,10 +1841,14 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.classList.add('active');
     document.getElementById('cat-' + btn.dataset.cat).classList.add('active');
     menuPanel.classList.toggle('no-scroll', noScrollCats.includes(btn.dataset.cat));
+    menuPanel.classList.toggle('bg-menu-active', btn.dataset.cat === 'bg');
     menuPanel.scrollTop = 0;
     menuPanel.scrollLeft = 0;
   });
 });
+
+const activeNavButton = document.querySelector('.nav-btn.active');
+menuPanel.classList.toggle('bg-menu-active', activeNavButton && activeNavButton.dataset.cat === 'bg');
 
 // ── ADD BUTTONS ──
 document.querySelectorAll('.add-btn').forEach(btn => {
@@ -1808,6 +1866,11 @@ document.querySelectorAll('.item-card').forEach(card => {
 function addItem(card) {
   const type = card.dataset.type;
   const id = card.dataset.id;
+
+  if (type === 'bg-upload') {
+    document.getElementById('bg-upload-input').click();
+    return;
+  }
 
   if (type === 'set') {
     // clear individual selections, apply set
@@ -1842,13 +1905,30 @@ function addItem(card) {
     }
   }
 
+  markDesignDirty();
+
   // button feedback
   const btn = card.querySelector('.add-btn');
+  if (!btn) return;
   const orig = btn.textContent;
   btn.textContent = '✓ 已加入';
   btn.style.background = '#4CAF50';
   setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 800);
 }
+
+document.getElementById('bg-upload-input').addEventListener('change', e => {
+  const file = e.target.files && e.target.files[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  if (uploadedBgObjectUrl) {
+    imageCache.delete(uploadedBgObjectUrl);
+    URL.revokeObjectURL(uploadedBgObjectUrl);
+  }
+  uploadedBgObjectUrl = URL.createObjectURL(file);
+  state.bgImg = uploadedBgObjectUrl;
+  applyStageBackground();
+  markDesignDirty();
+  e.target.value = '';
+});
 
 function applyStageBackground() {
   const stage = document.getElementById('stage');
@@ -1943,6 +2023,7 @@ function startDragFood(e, type) {
   const startY = e.clientY;
   const originX = pos.x;
   const originY = pos.y;
+  let moved = false;
 
   bringSlotToFront(type);
   slot.classList.add('dragging');
@@ -1957,6 +2038,7 @@ function startDragFood(e, type) {
       x: clamp(nextX, dragBounds.left, maxX),
       y: clamp(nextY, dragBounds.top, maxY)
     };
+    moved = moved || state.positions[type].x !== originX || state.positions[type].y !== originY;
     applySlotLayout(type);
   };
 
@@ -1966,6 +2048,7 @@ function startDragFood(e, type) {
     slot.removeEventListener('pointerup', stopDrag);
     slot.removeEventListener('pointercancel', stopDrag);
     slot.removeEventListener('lostpointercapture', stopDrag);
+    if (moved) markDesignDirty();
   };
 
   slot.addEventListener('pointermove', moveFood);
@@ -2018,6 +2101,7 @@ nameInput.addEventListener('input', () => {
   // limit to 10 chars
   if (nameInput.value.length > 10) nameInput.value = nameInput.value.slice(0,10);
   updateNameInputSize();
+  markDesignDirty();
 });
 updateNameInputSize();
 if (document.fonts) {
@@ -2057,6 +2141,8 @@ function updateNameInputSize() {
 
 // ── COMPLETE BUTTON ──
 document.getElementById('complete-btn').addEventListener('click', () => {
+  if (!isSavedCurrentDesign) resetSaveFeedback();
+
   // populate final card
   updateFinalFood('main', state.main);
   updateFinalFood('veg', state.veg);
@@ -2219,10 +2305,25 @@ async function renderSaveCanvas() {
 function showSaveFeedback(message = saveSuccessMessage) {
   const hint = document.getElementById('overlay-hint');
   const button = document.getElementById('overlay-save');
+  isSavedCurrentDesign = true;
   hint.textContent = message;
   hint.classList.add('success');
   button.classList.add('saved');
   button.textContent = '已儲存';
+}
+
+function markDesignDirty() {
+  isSavedCurrentDesign = false;
+  resetSaveFeedback();
+}
+
+function resetSaveFeedback() {
+  const hint = document.getElementById('overlay-hint');
+  const button = document.getElementById('overlay-save');
+  hint.textContent = saveHintDefault;
+  hint.classList.remove('success');
+  button.classList.remove('saved');
+  button.textContent = '儲存圖片';
 }
 
 function loadCanvasImage(src) {
