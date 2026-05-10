@@ -944,13 +944,27 @@
       flex:0 0 auto;
       position:sticky;
       left:12px;
-      z-index:2;
+      z-index: 3;
       background:#fff;
+    }
+
+    #sidebar .logo::before{
+      content:"";
+      position:absolute;
+      top:-14px;
+      left:-12px;
+      width:70px;
+      height:70px;
+      background:#fff;
+      z-index:0;
+      pointer-events:none;
     }
 
     #sidebar .logo img{
       width:42px;
       height:42px;
+      position:relative;
+      z-index:1;
     }
 
     .nav-btn{
