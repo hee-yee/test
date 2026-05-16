@@ -957,8 +957,8 @@
     padding:0;
     gap:0;
     background:transparent;
-    box-shadow:0 18px 48px rgba(0,0,0,.32);
-    overflow:hidden;
+    box-shadow:none;
+    overflow:visible;
     max-height:none;
     aspect-ratio:auto;
     height:auto;
@@ -971,7 +971,8 @@
     width:100%;
     height:auto;
     object-fit:contain;
-    background:#050505;
+    background:transparent;
+    filter:drop-shadow(0 18px 48px rgba(0,0,0,.32));
   }
   #repair-report.receipt-canvas-ready #receipt-preview-canvas{
     display:block;
