@@ -804,8 +804,13 @@
     align-items:center;justify-content:center;
     flex-direction:column;
     overflow:hidden;
+    padding:24px 24px 64px;
   }
   #overlay.show{display:flex;}
+  #overlay.report-visible{
+    align-items:center;
+    justify-content:center;
+  }
 
   #overlay-bg{
     position:absolute;inset:0;
@@ -823,6 +828,26 @@
     user-select:none;
     -webkit-user-select:none;
     -webkit-touch-callout:none;
+    width:560px;
+    height:393px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transform-origin:center;
+  }
+  #report-capture{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:34px;
+    width:min(96vw, 1480px);
+    padding:18px 24px 0;
+    margin-bottom:28px;
+  }
+  #report-capture #anim-card{
+    flex:0 0 auto;
   }
   #anim-card img,
   #anim-card .final-food,
@@ -834,7 +859,7 @@
   #anim-card img{pointer-events:none;}
   @keyframes popOut{
     0%{transform:scale(0) rotate(-5deg);}
-    100%{transform:scale(1) rotate(0deg);}
+    100%{transform:scale(.72) rotate(0deg);}
   }
 
   #anim-card .final-card{
@@ -893,12 +918,13 @@
   }
 
   #overlay-hint{
+    display:none;
     position:relative;z-index:2;
     color:#fff;
     font-family:var(--font-main);
     font-size:15px;font-weight:800;
     letter-spacing:.06em;
-    margin-top:16px;
+    margin-top:0;
     opacity:0;
     animation:fadeIn .4s .8s forwards;
     text-shadow:0 2px 4px rgba(0,0,0,.3);
@@ -911,7 +937,189 @@
   }
   @keyframes fadeIn{to{opacity:1;}}
 
+  #repair-report{
+    width:min(34vw, 340px);
+    aspect-ratio:9 / 16;
+    max-height:80vh;
+    background:#fff;
+    color:#242424;
+    border-radius:0;
+    box-shadow:0 18px 48px rgba(0,0,0,.28);
+    padding:30px 28px;
+    display:none;
+    flex-direction:column;
+    gap:18px;
+    transform:translateY(-120vh);
+    opacity:0;
+    pointer-events:none;
+  }
+  #repair-report.receipt-canvas-ready{
+    padding:0;
+    gap:0;
+    background:transparent;
+    box-shadow:0 18px 48px rgba(0,0,0,.32);
+    overflow:hidden;
+    max-height:none;
+    aspect-ratio:auto;
+    height:auto;
+  }
+  #repair-report.receipt-canvas-ready > :not(#receipt-preview-canvas){
+    display:none;
+  }
+  #receipt-preview-canvas{
+    display:none;
+    width:100%;
+    height:auto;
+    object-fit:contain;
+    background:#050505;
+  }
+  #repair-report.receipt-canvas-ready #receipt-preview-canvas{
+    display:block;
+  }
+  #overlay.report-visible #repair-report,
+  .capture-mode #repair-report{
+    display:flex;
+  }
+  #repair-report.report-ready{
+    animation:receiptSlideDown 3s ease-out forwards;
+    pointer-events:auto;
+  }
+  #repair-report.report-complete{
+    transform:translateY(0);
+    opacity:1;
+    pointer-events:auto;
+  }
+  @keyframes receiptSlideDown{
+    0%{transform:translateY(-120vh);opacity:0;}
+    72%{transform:translateY(10px);opacity:1;}
+    100%{transform:translateY(0);opacity:1;}
+  }
+  .report-kicker{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.08em;
+    color:var(--orange);
+  }
+  .report-title{
+    font-size:28px;
+    font-weight:800;
+    line-height:1.15;
+  }
+  .report-meta{
+    display:grid;
+    grid-template-columns:72px minmax(0,1fr);
+    gap:8px 12px;
+    font-size:13px;
+    line-height:1.45;
+  }
+  .report-meta dt{
+    color:#777;
+    font-weight:800;
+  }
+  .report-meta dd{
+    font-weight:800;
+    word-break:break-word;
+  }
+  .report-status-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    border-top:2px solid #eee;
+    border-bottom:2px solid #eee;
+    padding:12px 0;
+  }
+  .report-rate{
+    font-size:30px;
+    font-weight:800;
+    color:var(--orange);
+    white-space:nowrap;
+  }
+  .report-overall{
+    font-size:14px;
+    font-weight:800;
+    text-align:right;
+    line-height:1.35;
+  }
+  .monster-report-list{
+    display:grid;
+    gap:8px;
+  }
+  .monster-report-row{
+    display:grid;
+    grid-template-columns:74px 1fr auto;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    font-weight:800;
+  }
+  .monster-report-bar{
+    height:8px;
+    background:#ececec;
+    overflow:hidden;
+  }
+  .monster-report-fill{
+    height:100%;
+    width:0;
+    background:var(--orange);
+  }
+  .monster-report-status{
+    min-width:102px;
+    text-align:right;
+    font-size:11px;
+    letter-spacing:.03em;
+  }
+  .report-totals{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+  }
+  .report-total-box{
+    background:#f5f5f5;
+    padding:9px 8px;
+  }
+  .report-total-box span{
+    display:block;
+    font-size:10px;
+    color:#777;
+    font-weight:800;
+    margin-bottom:4px;
+  }
+  .report-total-box b{
+    font-size:16px;
+    font-weight:800;
+  }
+  .report-diagnosis{
+    border-top:2px solid #eee;
+    padding-top:14px;
+    display:grid;
+    gap:8px;
+  }
+  .report-monster-label{
+    font-size:13px;
+    line-height:1.45;
+    font-weight:800;
+    color:var(--orange);
+  }
+  .report-diagnosis h3{
+    font-size:17px;
+    line-height:1.45;
+    font-weight:800;
+  }
+  .report-stamp{
+    margin-top:auto;
+    align-self:flex-end;
+    border:3px solid var(--orange);
+    color:var(--orange);
+    padding:8px 12px;
+    font-size:18px;
+    font-weight:800;
+    transform:rotate(-4deg);
+    letter-spacing:.04em;
+  }
+
   #overlay-close{
+    display:none;
     position:relative;z-index:2;
     background:rgba(255,255,255,.25);
     border:2px solid #fff;
@@ -929,13 +1137,25 @@
   #overlay-close:hover{background:rgba(255,255,255,.4);box-shadow:0 6px 16px rgba(0,0,0,.18);}
   #overlay-actions{
     position:relative;z-index:2;
-    display:flex;
+    display:none;
     gap:12px;
-    margin-top:12px;
+    margin-top:14px;
     opacity:0;
     animation:fadeIn .4s 1s forwards;
   }
+  #overlay.save-ready #overlay-actions{
+    display:flex;
+    opacity:1;
+    animation:none;
+  }
+  #overlay.save-ready #overlay-hint,
+  #overlay.save-ready #overlay-close{
+    display:block;
+    opacity:1;
+    animation:none;
+  }
   #overlay-save{
+    display:none;
     background:#fff;
     border:2px solid #fff;
     color:var(--orange);
@@ -945,6 +1165,9 @@
     padding:8px 24px;
     border-radius:10px;
     cursor:pointer;
+  }
+  #overlay.save-ready #overlay-save{
+    display:block;
   }
   #overlay-save:hover{background:var(--orange);color:#fff;}
   #overlay-save:disabled{
@@ -957,6 +1180,67 @@
   }
   #overlay-save:active,
   #overlay-close:active{transform:scale(.96);}
+
+  .capture-mode #report-capture{
+    width:1680px;
+    min-height:1920px;
+    padding:0;
+    gap:0;
+    align-items:center;
+    justify-content:center;
+    background:transparent;
+  }
+  .capture-mode #anim-card{
+    width:600px;
+    height:1920px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    animation:none;
+    transform:none;
+  }
+  .capture-mode #repair-report{
+    width:1080px;
+    height:1920px;
+    max-height:none;
+    aspect-ratio:auto;
+    transform:none;
+    opacity:1;
+    animation:none;
+    box-shadow:none;
+    padding:96px 84px;
+    gap:46px;
+  }
+  .capture-mode #repair-report .report-kicker{font-size:34px;}
+  .capture-mode #repair-report .report-title{font-size:76px;}
+  .capture-mode #repair-report .report-meta{grid-template-columns:190px minmax(0,1fr);gap:22px 30px;font-size:34px;}
+  .capture-mode #repair-report .report-status-row{padding:36px 0;}
+  .capture-mode #repair-report .report-rate{font-size:86px;}
+  .capture-mode #repair-report .report-overall{font-size:38px;}
+  .capture-mode #repair-report .monster-report-list{gap:24px;}
+  .capture-mode #repair-report .monster-report-row{grid-template-columns:190px 1fr 260px;gap:28px;font-size:34px;}
+  .capture-mode #repair-report .monster-report-bar{height:22px;}
+  .capture-mode #repair-report .monster-report-status{font-size:26px;min-width:260px;}
+  .capture-mode #repair-report .report-totals{gap:22px;}
+  .capture-mode #repair-report .report-total-box{padding:26px 24px;}
+  .capture-mode #repair-report .report-total-box span{font-size:24px;margin-bottom:12px;}
+  .capture-mode #repair-report .report-total-box b{font-size:42px;}
+  .capture-mode #repair-report .report-diagnosis{padding-top:38px;gap:22px;}
+  .capture-mode #repair-report .report-monster-label{font-size:34px;}
+  .capture-mode #repair-report .report-diagnosis h3{font-size:44px;}
+  .capture-mode #repair-report .report-stamp{border-width:8px;padding:22px 34px;font-size:52px;}
+
+  .hidden-capture-host{
+    position:fixed;
+    left:-10000px;
+    top:0;
+    width:1080px;
+    height:1920px;
+    overflow:hidden;
+    pointer-events:none;
+    opacity:0;
+    z-index:-1;
+  }
 
   /* save canvas (hidden) */
   #save-canvas{display:none;}
@@ -1341,6 +1625,56 @@
     @keyframes popOutMobile{
       0%{transform:scale(0) rotate(-5deg);}
       100%{transform:scale(.58) rotate(0deg);}
+    }
+
+    #report-capture{
+      flex-direction:column;
+      gap:4px;
+      padding:10px;
+      width:100vw;
+      min-height:0;
+    }
+
+    #repair-report{
+      width:min(78vw, 300px);
+      max-height:48vh;
+      padding:18px 16px;
+      gap:9px;
+      overflow:hidden;
+    }
+
+    .report-kicker{font-size:10px;}
+    .report-title{font-size:20px;}
+    .report-meta{
+      grid-template-columns:56px minmax(0,1fr);
+      gap:5px 8px;
+      font-size:10px;
+    }
+    .report-status-row{padding:7px 0;}
+    .report-rate{font-size:22px;}
+    .report-overall{font-size:11px;}
+    .monster-report-list{gap:5px;}
+    .monster-report-row{
+      grid-template-columns:58px 1fr 84px;
+      gap:6px;
+      font-size:10px;
+    }
+    .monster-report-bar{height:6px;}
+    .monster-report-status{
+      min-width:84px;
+      font-size:8px;
+    }
+    .report-totals{gap:5px;}
+    .report-total-box{padding:6px 5px;}
+    .report-total-box span{font-size:8px;margin-bottom:2px;}
+    .report-total-box b{font-size:12px;}
+    .report-diagnosis{padding-top:8px;gap:4px;}
+    .report-monster-label{font-size:10px;line-height:1.35;}
+    .report-diagnosis h3{font-size:12px;line-height:1.3;}
+    .report-stamp{
+      border-width:2px;
+      padding:5px 8px;
+      font-size:13px;
     }
 
     #overlay-hint{
@@ -1861,18 +2195,52 @@
 <!-- ── COMPLETION OVERLAY ── -->
 <div id="overlay">
   <div id="overlay-bg"><img id="overlay-bg-img" alt="" aria-hidden="true"></div>
-  <div id="anim-card">
-    <div class="final-card" id="final-card">
-      <div class="final-food" id="ff-main"></div>
-      <div class="final-food" id="ff-veg"></div>
-      <div class="final-food" id="ff-fruit"></div>
-      <div class="final-food" id="ff-dessert"></div>
-      <div class="final-food" id="ff-drink"></div>
-      <div class="final-food" id="ff-name-sticker"></div>
-      <div id="ff-name"></div>
+  <div id="report-capture">
+    <div id="anim-card">
+      <div class="final-card" id="final-card">
+        <div class="final-food" id="ff-main"></div>
+        <div class="final-food" id="ff-veg"></div>
+        <div class="final-food" id="ff-fruit"></div>
+        <div class="final-food" id="ff-dessert"></div>
+        <div class="final-food" id="ff-drink"></div>
+        <div class="final-food" id="ff-name-sticker"></div>
+        <div id="ff-name"></div>
+      </div>
+    </div>
+    <div id="repair-report" aria-label="修復報告明細">
+      <canvas id="receipt-preview-canvas" aria-hidden="true"></canvas>
+      <div>
+        <div class="report-kicker">MOONSTER REPAIR RECEIPT</div>
+        <div class="report-title">夜獸修復報告明細</div>
+      </div>
+      <dl class="report-meta">
+        <dt>食客</dt><dd data-report-field="guest">NAME</dd>
+        <dt>日期</dt><dd data-report-field="date">----</dd>
+        <dt>單號</dt><dd data-report-field="order">#NB----</dd>
+        <dt>班別</dt><dd data-report-field="shift">夜班 22:00 — 06:00</dd>
+        <dt>程度</dt><dd data-report-field="tonightRepairDegree">0%</dd>
+      </dl>
+      <div class="report-status-row">
+        <div>
+          <div class="report-kicker">TONIGHT'S REPAIR RATE</div>
+          <div class="report-rate" data-report-field="repairRate">0.00%</div>
+        </div>
+        <div class="report-overall" data-report-field="overallStatus">已結帳・修復中</div>
+      </div>
+      <div class="monster-report-list" data-report-field="monsterList"></div>
+      <div class="report-totals">
+        <div class="report-total-box"><span>傷害總值</span><b data-report-field="damage">400點</b></div>
+        <div class="report-total-box"><span>已修復</span><b data-report-field="repaired">0點</b></div>
+        <div class="report-total-box"><span>殘餘</span><b data-report-field="remaining">400點</b></div>
+      </div>
+      <div class="report-diagnosis">
+        <div class="report-monster-label" data-report-field="diagnosisMonster">今晚你最在意的是 —— 夜獸名稱</div>
+        <h3 data-report-field="diagnosisTitle"></h3>
+      </div>
+      <div class="report-stamp" data-report-field="stamp">UNTREATED</div>
     </div>
   </div>
-  <div id="overlay-hint">點擊儲存圖片，即可將套餐卡儲存到裝置</div>
+  <div id="overlay-hint">點擊儲存圖片，即可將套餐卡與修復明細儲存到裝置</div>
   <div id="overlay-actions">
     <button id="overlay-save">儲存圖片</button>
     <button id="overlay-close">返回繼續編輯</button>
@@ -1951,6 +2319,83 @@ const setPresets = {
   },
 };
 
+const repairWeights = {
+  main: 40,
+  veg: 15,
+  fruit: 15,
+  dessert: 15,
+  drink: 15
+};
+
+const moonsterProfiles = [
+  {
+    id: 'O',
+    name: '寂凸怪',
+    items: {
+      main: '寂凸怪蛋吐司',
+      veg: '南瓜',
+      fruit: '柳橙',
+      dessert: '香蕉布丁',
+      drink: '花草茶'
+    },
+    diagnosis: [
+      ['你感受到的，是那種難以言喻的孤獨', ''],
+      ['你感受到的，是情緒沒有地方放', ''],
+      ['你感受到的，是社交變成一件很難的事', '']
+    ]
+  },
+  {
+    id: 'P',
+    name: '睏飽寶',
+    items: {
+      main: '睏飽寶漢堡包',
+      veg: '甜菜根',
+      fruit: '櫻桃',
+      dessert: '草莓優格',
+      drink: '能量飲'
+    },
+    diagnosis: [
+      ['你感受到的，是身體說不清的沉重', ''],
+      ['你感受到的，是躺下去卻睡不著的煎熬', ''],
+      ['你感受到的，是永遠睡不飽的感覺', '']
+    ]
+  },
+  {
+    id: 'B',
+    name: '夜魔瞎',
+    items: {
+      main: '夜魔瞎肉夾饃',
+      veg: '茄子',
+      fruit: '藍莓',
+      dessert: '蝶豆花凍',
+      drink: '桑椹果醋'
+    },
+    diagnosis: [
+      ['你感受到的，是精神迷離的視線渙散', ''],
+      ['你感受到的，是夜晚造成的視線模糊感', ''],
+      ['你感受到的，是昏暗的路、疲憊的眼', '']
+    ]
+  },
+  {
+    id: 'G',
+    name: '小燒貨',
+    items: {
+      main: '小燒貨大燒餅',
+      veg: '苦瓜',
+      fruit: '奇異果',
+      dessert: '綠豆湯',
+      drink: '蘆筍汁'
+    },
+    diagnosis: [
+      ['你感受到的，是那種無法預測的不安全感', ''],
+      ['你感受到的，是那種不可預測的慢性焦慮', ''],
+      ['你感受到的，是隨時可能爆發意外的緊張感', '']
+    ]
+  }
+];
+
+const reportSession = createReportSession();
+
 function foodImage(src, alt) {
   return { src: stickerSrcFromOriginal(src), alt };
 }
@@ -1975,6 +2420,7 @@ const preloadAssets = [
 ];
 let uploadedBgObjectUrl = null;
 let isSavedCurrentDesign = false;
+let reportRevealTimer = null;
 preloadAssets.forEach(preloadImage);
 updateResponsiveScale();
 window.addEventListener('resize', updateResponsiveScale);
@@ -2382,9 +2828,147 @@ function updateNameInputSize() {
   return size;
 }
 
+function createReportSession() {
+  const now = new Date();
+  const storageKey = 'moonsterRepairSerial';
+  const sessionKey = 'moonsterRepairOrder';
+  const existingOrder = sessionStorage.getItem(sessionKey);
+  if (existingOrder) {
+    return { date: formatReportDate(now), orderNo: existingOrder };
+  }
+
+  const nextSerial = getNextRepairSerial(storageKey);
+  const orderNo = `#${String(nextSerial).padStart(4, '0')}`;
+  sessionStorage.setItem(sessionKey, orderNo);
+  return { date: formatReportDate(now), orderNo };
+}
+
+function getNextRepairSerial(storageKey) {
+  const current = Number(localStorage.getItem(storageKey) || '0');
+  const next = Number.isFinite(current) ? current + 1 : 1;
+  localStorage.setItem(storageKey, String(next));
+  return next;
+}
+
+function formatReportDate(date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0')
+  ].join('/');
+}
+
+function buildRepairReportData() {
+  const scores = moonsterProfiles.map(profile => {
+    const points = Object.keys(repairWeights).reduce((total, type) => {
+      const selected = state[type];
+      return total + (selected && selected.alt === profile.items[type] ? repairWeights[type] : 0);
+    }, 0);
+    return {
+      id: profile.id,
+      name: profile.name,
+      points,
+      status: repairStatusLabel(points),
+      diagnosis: profile.diagnosis
+    };
+  });
+  const repaired = scores.reduce((total, item) => total + item.points, 0);
+  const topScore = scores.reduce((top, item) => item.points > top.points ? item : top, scores[0]);
+  const repairRate = Math.min(100, Math.round(80 + topScore.points / 100 * 20));
+  const diagnosis = randomItem(topScore.diagnosis);
+
+  return {
+    guest: getEnteredName() || 'NAME',
+    date: reportSession.date,
+    orderNo: reportSession.orderNo,
+    shift: '夜班 22:00 — 06:00',
+    scores,
+    tonightRepairDegree: Math.min(100, repaired),
+    repairRate,
+    damage: 400,
+    repaired,
+    remaining: 400 - repaired,
+    overallStatus: repairRate === 100 ? '已結帳・修復完成' : '已結帳・修復中',
+    stamp: stampLabel(scores),
+    diagnosisMonsterId: topScore.id,
+    diagnosisMonster: `今晚你最在意的是 —— ${topScore.name}`,
+    diagnosisTitle: diagnosis[0],
+    diagnosisText: diagnosis[1] || '',
+    meals: {
+      main: state.main?.alt || '',
+      veg: state.veg?.alt || '',
+      fruit: state.fruit?.alt || '',
+      dessert: state.dessert?.alt || '',
+      drink: state.drink?.alt || ''
+    }
+  };
+}
+
+function repairStatusLabel(points) {
+  if (points === 100) return 'FULL REPAIR';
+  if (points > 0) return `PARTIAL ${points}%`;
+  return 'UNTREATED';
+}
+
+function stampLabel(scores) {
+  if (scores.every(score => score.points === 100)) return 'FULL REPAIR';
+  if (scores.some(score => score.points > 0)) return 'PARTIAL REPAIR';
+  return 'UNTREATED';
+}
+
+function randomItem(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function populateRepairReport() {
+  const data = buildRepairReportData();
+  const report = document.getElementById('repair-report');
+  report.querySelector('[data-report-field="guest"]').textContent = data.guest;
+  report.querySelector('[data-report-field="date"]').textContent = data.date;
+  report.querySelector('[data-report-field="order"]').textContent = data.orderNo;
+  report.querySelector('[data-report-field="shift"]').textContent = data.shift;
+  report.querySelector('[data-report-field="tonightRepairDegree"]').textContent = `${data.tonightRepairDegree}%`;
+  report.querySelector('[data-report-field="repairRate"]').textContent = `${data.repairRate}%`;
+  report.querySelector('[data-report-field="overallStatus"]').textContent = data.overallStatus;
+  report.querySelector('[data-report-field="damage"]').textContent = `${data.damage}點`;
+  report.querySelector('[data-report-field="repaired"]').textContent = `${data.repaired}點`;
+  report.querySelector('[data-report-field="remaining"]').textContent = `${data.remaining}點`;
+  report.querySelector('[data-report-field="diagnosisMonster"]').textContent = data.diagnosisMonster;
+  report.querySelector('[data-report-field="diagnosisTitle"]').textContent = data.diagnosisTitle;
+  report.querySelector('[data-report-field="stamp"]').textContent = data.stamp;
+
+  const list = report.querySelector('[data-report-field="monsterList"]');
+  list.replaceChildren(...data.scores.map(score => {
+    const row = document.createElement('div');
+    row.className = 'monster-report-row';
+
+    const name = document.createElement('div');
+    name.textContent = score.name;
+
+    const bar = document.createElement('div');
+    bar.className = 'monster-report-bar';
+    const fill = document.createElement('div');
+    fill.className = 'monster-report-fill';
+    fill.style.width = `${score.points}%`;
+    bar.appendChild(fill);
+
+    const status = document.createElement('div');
+    status.className = 'monster-report-status';
+    status.textContent = score.status;
+
+    row.append(name, bar, status);
+    return row;
+  }));
+}
+
 // ── COMPLETE BUTTON ──
-document.getElementById('complete-btn').addEventListener('click', () => {
+document.getElementById('complete-btn').addEventListener('click', async () => {
   if (!isSavedCurrentDesign) resetSaveFeedback();
+  const overlay = document.getElementById('overlay');
+  const repairReport = document.getElementById('repair-report');
+  clearReportRevealTimer();
+  overlay.classList.remove('report-visible', 'save-ready');
+  repairReport.classList.remove('report-ready', 'report-complete', 'receipt-canvas-ready');
 
   // populate final card
   updateFinalFood('main', state.main);
@@ -2396,17 +2980,62 @@ document.getElementById('complete-btn').addEventListener('click', () => {
   document.getElementById('ff-name').textContent = getEnteredName();
   updateNameInputSize();
   applyStageBackground();
+  populateRepairReport();
+  await updateReceiptPreviewCanvas();
 
   // reset animation
   const animCard = document.getElementById('anim-card');
   animCard.style.animation = 'none';
   void animCard.offsetWidth;
+  animCard.addEventListener('animationend', scheduleReceiptReveal, { once: true });
   animCard.style.animation = '';
 
-  document.getElementById('overlay').classList.add('show');
+  overlay.classList.add('show');
 
   spawnConfetti();
 });
+
+function scheduleReceiptReveal() {
+  clearReportRevealTimer();
+  reportRevealTimer = setTimeout(showReceiptReport, 1000);
+}
+
+function showReceiptReport() {
+  const overlay = document.getElementById('overlay');
+  const repairReport = document.getElementById('repair-report');
+  overlay.classList.add('report-visible');
+  repairReport.classList.remove('report-ready', 'report-complete');
+  void repairReport.offsetWidth;
+  repairReport.addEventListener('animationend', showSaveButtonAfterReceipt, { once: true });
+  repairReport.classList.add('report-ready');
+  reportRevealTimer = null;
+}
+
+function showSaveButtonAfterReceipt(event) {
+  if (event && event.target !== document.getElementById('repair-report')) return;
+  const repairReport = document.getElementById('repair-report');
+  repairReport.classList.remove('report-ready');
+  repairReport.classList.add('report-complete');
+  document.getElementById('overlay').classList.add('save-ready');
+}
+
+function clearReportRevealTimer() {
+  if (!reportRevealTimer) return;
+  clearTimeout(reportRevealTimer);
+  reportRevealTimer = null;
+}
+
+async function updateReceiptPreviewCanvas() {
+  const report = document.getElementById('repair-report');
+  const preview = document.getElementById('receipt-preview-canvas');
+  const receiptCanvas = await renderReceiptCanvas();
+  preview.width = receiptCanvas.width;
+  preview.height = receiptCanvas.height;
+  const ctx = preview.getContext('2d');
+  ctx.clearRect(0, 0, preview.width, preview.height);
+  ctx.drawImage(receiptCanvas, 0, 0);
+  report.classList.add('receipt-canvas-ready');
+}
 
 function updateFinalFood(type, item) {
   const slot = document.getElementById(finalSlotId(type));
@@ -2450,11 +3079,13 @@ function spawnConfetti() {
 
 // ── CLOSE OVERLAY ──
 document.getElementById('overlay-close').addEventListener('click', () => {
-  document.getElementById('overlay').classList.remove('show');
+  clearReportRevealTimer();
+  document.getElementById('overlay').classList.remove('show', 'report-visible', 'capture-mode', 'save-ready');
+  document.getElementById('repair-report').classList.remove('report-ready', 'report-complete');
 });
 
 // ── SAVE BUTTON ──
-const saveHintDefault = '點擊儲存圖片，即可將套餐卡儲存到裝置';
+const saveHintDefault = '點擊儲存圖片，即可將套餐卡與修復明細儲存到裝置';
 const saveSuccessMessage = '已儲存圖片';
 const saveButton = document.getElementById('overlay-save');
 saveButton.addEventListener('click', saveCardNow);
@@ -2465,15 +3096,19 @@ async function saveCardNow() {
   document.getElementById('overlay-hint').textContent = '正在準備圖片...';
 
   try {
-    const canvas = await renderSaveCanvas();
-    const result = await downloadCanvas(canvas, 'monster-meal.png');
+    populateRepairReport();
+    const cardCanvas = await renderSaveCanvas();
+    const cardResult = await downloadCanvas(cardCanvas, 'moonster-card.png');
+    await delay(250);
+    const receiptCanvas = await renderReceiptCanvas();
+    const receiptResult = await downloadCanvas(receiptCanvas, 'moonster-receipt.png');
     const messages = {
       picked: saveSuccessMessage,
       shared: saveSuccessMessage,
       opened: '圖片已開啟，請長按或右鍵儲存',
       downloaded: saveSuccessMessage
     };
-    showSaveFeedback(messages[result] || messages.downloaded);
+    showSaveFeedback(messages[receiptResult] || messages[cardResult] || messages.downloaded);
   } catch (err) {
     if (err && err.name === 'AbortError') {
       document.getElementById('overlay-hint').textContent = saveHintDefault;
@@ -2490,6 +3125,185 @@ async function saveCardNow() {
       saveButton.textContent = '儲存圖片';
     }
   }
+}
+
+async function renderReceiptCanvas() {
+  const data = buildRepairReportData();
+  const base = await loadCanvasImage('素材/小票/receipt_empty.png?v=2');
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = base.naturalWidth || base.width;
+  canvas.height = base.naturalHeight || base.height;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(base, 0, 0, canvas.width, canvas.height);
+
+  await document.fonts?.ready;
+  await drawReceiptOverlay(ctx, data, canvas.width, canvas.height);
+  return canvas;
+}
+
+async function drawReceiptOverlay(ctx, data, width, height) {
+  const sx = width / 4500;
+  const sy = height / 8000;
+  const s = Math.min(sx, sy);
+  const x = value => value * sx;
+  const y = value => value * sy;
+  const orange = '#FF6B00';
+
+  ctx.save();
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textBaseline = 'alphabetic';
+
+  ctx.font = `800 ${100 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  ctx.textAlign = 'left';
+  fitReceiptText(ctx, data.guest, x(330), y(1405), x(680));
+  fitReceiptText(ctx, data.date, x(1365), y(1405), x(760));
+  fitReceiptText(ctx, data.orderNo, x(2390), y(1405), x(760));
+
+  ctx.font = `800 ${120 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  ctx.textAlign = 'right';
+  drawReceiptCover(ctx, x(3130), y(1750), x(1055), y(225), sx, sy);
+  fitReceiptText(ctx, data.overallStatus, x(4185), y(1920), x(1055));
+
+  ctx.font = `800 ${280 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  ctx.textAlign = 'left';
+  ctx.fillText(`${Math.round(data.repairRate)}%`, x(300), y(2220));
+
+  const rows = [
+    { id: 'O', barY: 2620 },
+    { id: 'P', barY: 3102 },
+    { id: 'B', barY: 3581 },
+    { id: 'G', barY: 4064 }
+  ];
+  const barX = x(292);
+  const barW = x(3912);
+  const barH = y(50);
+  rows.forEach(row => {
+    const score = data.scores.find(item => item.id === row.id);
+    const percent = Math.max(0, Math.min(100, score?.points || 0));
+    const filledW = barW * percent / 100;
+    drawReceiptProgressTrack(ctx, barX, y(row.barY), barW, barH);
+    if (filledW > 0) {
+      drawReceiptRoundRect(ctx, barX, y(row.barY), filledW, barH, barH / 2, orange);
+    }
+  });
+
+  const mealRows = [
+    ['main', 4785],
+    ['veg', 4985],
+    ['fruit', 5185],
+    ['dessert', 5385],
+    ['drink', 5585]
+  ];
+  ctx.font = `400 ${108 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  ctx.textAlign = 'right';
+  mealRows.forEach(([type, baseline]) => {
+    fitReceiptText(ctx, data.meals[type] || '未選擇', x(4025), y(baseline), x(1080));
+  });
+
+  const monsterName = data.scores.find(score => score.id === data.diagnosisMonsterId)?.name || '';
+  ctx.font = `800 ${190 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  ctx.textAlign = 'left';
+  const prefix = '今晚你最在意的是 ';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(prefix, x(300), y(6400));
+  ctx.fillStyle = orange;
+  ctx.font = `800 ${300 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  fitReceiptText(ctx, monsterName, x(2050), y(6400), x(1650));
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `800 ${160 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  wrapReceiptText(ctx, data.diagnosisTitle, x(300), y(6675), x(3000), 1.12, 2);
+
+  const stampId = data.diagnosisMonsterId || 'O';
+  const stamp = await loadCanvasImage(`素材/小票/${stampId}stamp.png`);
+  ctx.globalAlpha = 0.96;
+  drawReceiptImageContain(ctx, stamp, x(3475), y(6700), x(700), y(700));
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+function drawReceiptCover(ctx, x, y, width, height, sx = 1, sy = 1) {
+  const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
+  gradient.addColorStop(0, 'rgba(0,0,0,.94)');
+  gradient.addColorStop(0.5, 'rgba(4,4,4,.98)');
+  gradient.addColorStop(1, 'rgba(0,0,0,.94)');
+  ctx.save();
+  ctx.fillStyle = gradient;
+  ctx.fillRect(x - 8 * sx, y - 8 * sy, width + 16 * sx, height + 16 * sy);
+  ctx.restore();
+}
+
+function drawReceiptProgressTrack(ctx, x, y, width, height) {
+  ctx.save();
+  ctx.globalAlpha = 0.96;
+  drawReceiptRoundRect(ctx, x, y, width, height, height / 2, '#333333');
+  ctx.restore();
+}
+
+function drawReceiptRoundRect(ctx, x, y, width, height, radius, fillStyle) {
+  if (width <= 0 || height <= 0) return;
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.save();
+  ctx.fillStyle = fillStyle;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + width - r, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+  ctx.lineTo(x + width, y + height - r);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  ctx.lineTo(x + r, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.fill();
+  ctx.restore();
+}
+
+function fitReceiptText(ctx, text, x, y, maxWidth) {
+  const value = String(text || '');
+  if (!value) return;
+  ctx.save();
+  const parts = ctx.font.match(/^(\D*?)(\d+(?:\.\d+)?)px(.+)$/);
+  if (parts) {
+    let size = Number(parts[2]);
+    while (size > 18 && ctx.measureText(value).width > maxWidth) {
+      size -= 2;
+      ctx.font = `${parts[1]}${size}px${parts[3]}`;
+    }
+  }
+  ctx.fillText(value, x, y);
+  ctx.restore();
+}
+
+function wrapReceiptText(ctx, text, x, y, maxWidth, lineHeightRatio = 1.3, maxLines = Infinity) {
+  const chars = Array.from(String(text || ''));
+  const sizeMatch = ctx.font.match(/(\d+(?:\.\d+)?)px/);
+  const lineHeight = (sizeMatch ? Number(sizeMatch[1]) : 24) * lineHeightRatio;
+  const lines = [];
+  let line = '';
+  chars.forEach(char => {
+    const testLine = line + char;
+    if (line && ctx.measureText(testLine).width > maxWidth) {
+      lines.push(line);
+      line = char;
+    } else {
+      line = testLine;
+    }
+  });
+  if (line) lines.push(line);
+  lines.slice(0, maxLines).forEach((drawLine, index) => ctx.fillText(drawLine, x, y + lineHeight * index));
+}
+
+function drawReceiptImageContain(ctx, img, x, y, width, height) {
+  const ratio = Math.min(width / img.width, height / img.height);
+  const drawW = img.width * ratio;
+  const drawH = img.height * ratio;
+  ctx.drawImage(img, x + (width - drawW) / 2, y + (height - drawH) / 2, drawW, drawH);
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function renderSaveCanvas() {
