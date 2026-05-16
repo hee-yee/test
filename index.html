@@ -2962,7 +2962,10 @@ function buildRepairReportData() {
   });
   const repaired = scores.reduce((total, item) => total + item.points, 0);
   const topScore = scores.reduce((top, item) => item.points > top.points ? item : top, scores[0]);
-  const repairRate = Math.min(100, Math.round(80 + topScore.points / 100 * 20));
+  const hasCompleteMeal = Object.keys(repairWeights).every(type => Boolean(state[type]));
+  const repairRate = hasCompleteMeal
+    ? Math.min(100, Math.round(80 + topScore.points / 100 * 20))
+    : repaired / 400 * 100;
   const diagnosis = randomItem(topScore.diagnosis);
 
   return {
@@ -3008,6 +3011,10 @@ function randomItem(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
 
+function formatRepairRate(rate) {
+  return Number.isInteger(rate) ? String(rate) : rate.toFixed(2);
+}
+
 function populateRepairReport() {
   const data = buildRepairReportData();
   const report = document.getElementById('repair-report');
@@ -3016,7 +3023,7 @@ function populateRepairReport() {
   report.querySelector('[data-report-field="order"]').textContent = data.orderNo;
   report.querySelector('[data-report-field="shift"]').textContent = data.shift;
   report.querySelector('[data-report-field="tonightRepairDegree"]').textContent = `${data.tonightRepairDegree}%`;
-  report.querySelector('[data-report-field="repairRate"]').textContent = `${data.repairRate}%`;
+  report.querySelector('[data-report-field="repairRate"]').textContent = `${formatRepairRate(data.repairRate)}%`;
   report.querySelector('[data-report-field="overallStatus"]').textContent = data.overallStatus;
   report.querySelector('[data-report-field="damage"]').textContent = `${data.damage}點`;
   report.querySelector('[data-report-field="repaired"]').textContent = `${data.repaired}點`;
@@ -3301,7 +3308,7 @@ async function drawReceiptOverlay(ctx, data, width, height) {
 
   ctx.font = `800 ${280 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
   ctx.textAlign = 'left';
-  ctx.fillText(`${Math.round(data.repairRate)}%`, x(300), y(2220));
+  fitReceiptText(ctx, `${formatRepairRate(data.repairRate)}%`, x(300), y(2220), x(1250));
 
   const rows = [
     { id: 'O', barY: 2620 },
