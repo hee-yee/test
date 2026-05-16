@@ -1711,7 +1711,7 @@
     /* Final save-ready screen layout */
     #overlay.save-ready{
       justify-content:flex-start;
-      padding-top:12px;
+      padding-top:0;
       padding-bottom:72px;
     }
 
@@ -1722,19 +1722,24 @@
       -webkit-overflow-scrolling:touch;
       padding:0;
       margin-bottom:0;
-      gap:8px;
+      gap:0;
       align-items:center;
+      position:relative;
     }
 
-    /* Re-show card as small thumbnail in final screen */
+    /* Card overlaid on receipt (absolute, centered, ~18% from top) */
     #overlay.save-ready #anim-card.mobile-card-done{
       display:block;
-      animation:none;
-      width:157px;
-      height:110px;
+      position:absolute;
+      left:50%;
+      top:115px;
+      transform:translateX(-50%);
+      width:250px;
+      height:175px;
       overflow:hidden;
-      flex-shrink:0;
-      align-self:center;
+      z-index:5;
+      pointer-events:none;
+      animation:none;
     }
 
     #overlay.save-ready #anim-card.mobile-card-done .final-card{
@@ -1743,12 +1748,12 @@
       left:0;
       width:560px;
       height:393px;
-      transform:scale(0.28);
+      transform:scale(0.446);
       transform-origin:top left;
     }
 
     #overlay.save-ready #repair-report{
-      width:min(88vw,300px);
+      width:min(92vw,380px);
       max-height:none;
     }
 
@@ -1764,7 +1769,7 @@
       margin-top:0;
       padding:12px 16px;
       justify-content:center;
-      background:rgba(0,0,0,.18);
+      background:var(--orange);
       gap:12px;
     }
 
@@ -3202,7 +3207,8 @@ async function saveCardNow() {
     const cardCanvas = await renderSaveCanvas();
     const cardResult = await downloadCanvas(cardCanvas, 'moonster-card.png');
     await delay(250);
-    const receiptCanvas = await renderReceiptCanvas();
+    const isMobileSave = matchMedia('(max-width:767px)').matches;
+    const receiptCanvas = await renderReceiptCanvas(isMobileSave ? 1200 : undefined);
     const receiptResult = await downloadCanvas(receiptCanvas, 'moonster-receipt.png');
     const messages = {
       picked: saveSuccessMessage,
@@ -3231,7 +3237,12 @@ async function saveCardNow() {
 
 async function renderReceiptCanvas(maxWidth) {
   const data = buildRepairReportData();
-  const base = await loadCanvasImage('素材/小票/receipt_empty.png?v=2');
+  // On mobile (maxWidth provided), use RGBA PNG to avoid indexed PNG tRNS
+  // transparency issues on Safari iOS. receipt_mobile.png is already 1200×2132.
+  const src = maxWidth
+    ? '素材/小票/receipt_mobile.png'
+    : '素材/小票/receipt_empty.png?v=2';
+  const base = await loadCanvasImage(src);
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   let w = base.naturalWidth || base.width;
