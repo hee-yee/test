@@ -971,7 +971,7 @@
     width:100%;
     height:auto;
     object-fit:contain;
-    background:#050505;
+    background:transparent;
   }
   #repair-report.receipt-canvas-ready #receipt-preview-canvas{
     display:block;
@@ -1703,24 +1703,53 @@
       animation:popOutMobileExit .6s cubic-bezier(.34,1.56,.64,1) forwards;
     }
 
+    /* Card hidden after exit, while receipt animates in */
+    #anim-card.mobile-card-done{
+      display:none;
+    }
+
+    /* Final save-ready screen layout */
     #overlay.save-ready{
       justify-content:flex-start;
-      padding-top:16px;
+      padding-top:12px;
       padding-bottom:72px;
     }
 
     #overlay.save-ready #report-capture{
+      flex:1;
+      min-height:0;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
       padding:0;
       margin-bottom:0;
+      gap:8px;
+      align-items:center;
     }
 
-    #overlay.save-ready #anim-card{
-      display:none;
+    /* Re-show card as small thumbnail in final screen */
+    #overlay.save-ready #anim-card.mobile-card-done{
+      display:block;
+      animation:none;
+      width:157px;
+      height:110px;
+      overflow:hidden;
+      flex-shrink:0;
+      align-self:center;
+    }
+
+    #overlay.save-ready #anim-card.mobile-card-done .final-card{
+      position:absolute;
+      top:0;
+      left:0;
+      width:560px;
+      height:393px;
+      transform:scale(0.28);
+      transform-origin:top left;
     }
 
     #overlay.save-ready #repair-report{
-      max-height:calc(100dvh - 88px);
-      width:min(88vw,340px);
+      width:min(88vw,300px);
+      max-height:none;
     }
 
     #overlay.save-ready #overlay-hint{
@@ -3059,6 +3088,8 @@ function scheduleReceiptReveal() {
       animCard.addEventListener('animationend', () => {
         if (!mobileCardExitPending) return;
         mobileCardExitPending = false;
+        animCard.classList.remove('mobile-card-exit');
+        animCard.classList.add('mobile-card-done');
         showReceiptReport();
       }, { once: true });
     }, 1000);
@@ -3089,7 +3120,7 @@ function showSaveButtonAfterReceipt(event) {
 function clearReportRevealTimer() {
   mobileCardExitPending = false;
   const animCard = document.getElementById('anim-card');
-  if (animCard) animCard.classList.remove('mobile-card-exit');
+  if (animCard) animCard.classList.remove('mobile-card-exit', 'mobile-card-done');
   if (!reportRevealTimer) return;
   clearTimeout(reportRevealTimer);
   reportRevealTimer = null;
@@ -3098,7 +3129,8 @@ function clearReportRevealTimer() {
 async function updateReceiptPreviewCanvas() {
   const report = document.getElementById('repair-report');
   const preview = document.getElementById('receipt-preview-canvas');
-  const receiptCanvas = await renderReceiptCanvas();
+  const isMobile = matchMedia('(max-width:767px)').matches;
+  const receiptCanvas = await renderReceiptCanvas(isMobile ? 1200 : undefined);
   preview.width = receiptCanvas.width;
   preview.height = receiptCanvas.height;
   const ctx = preview.getContext('2d');
@@ -3197,19 +3229,25 @@ async function saveCardNow() {
   }
 }
 
-async function renderReceiptCanvas() {
+async function renderReceiptCanvas(maxWidth) {
   const data = buildRepairReportData();
   const base = await loadCanvasImage('素材/小票/receipt_empty.png?v=2');
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = base.naturalWidth || base.width;
-  canvas.height = base.naturalHeight || base.height;
+  let w = base.naturalWidth || base.width;
+  let h = base.naturalHeight || base.height;
+  if (maxWidth && w > maxWidth) {
+    h = Math.round(h * maxWidth / w);
+    w = maxWidth;
+  }
+  canvas.width = w;
+  canvas.height = h;
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(base, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(base, 0, 0, w, h);
 
   await document.fonts?.ready;
-  await drawReceiptOverlay(ctx, data, canvas.width, canvas.height);
+  await drawReceiptOverlay(ctx, data, w, h);
   return canvas;
 }
 
