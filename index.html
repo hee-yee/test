@@ -2875,8 +2875,9 @@ function buildRepairReportData() {
   });
   const repaired = scores.reduce((total, item) => total + item.points, 0);
   const topScore = scores.reduce((top, item) => item.points > top.points ? item : top, scores[0]);
-  const repairRate = Math.min(100, Math.round(80 + topScore.points / 100 * 20));
-  const diagnosis = randomItem(topScore.diagnosis);
+  const hasDiagnosis = repaired > 0;
+  const repairRate = hasDiagnosis ? Math.min(100, Math.round(80 + topScore.points / 100 * 20)) : 0;
+  const diagnosis = hasDiagnosis ? randomItem(topScore.diagnosis) : ['', ''];
 
   return {
     guest: getEnteredName() || 'NAME',
@@ -2891,8 +2892,9 @@ function buildRepairReportData() {
     remaining: 400 - repaired,
     overallStatus: repairRate === 100 ? '已結帳・修復完成' : '已結帳・修復中',
     stamp: stampLabel(scores),
-    diagnosisMonsterId: topScore.id,
-    diagnosisMonster: `今晚你最在意的是 —— ${topScore.name}`,
+    hasDiagnosis,
+    diagnosisMonsterId: hasDiagnosis ? topScore.id : '',
+    diagnosisMonster: hasDiagnosis ? `今晚你最在意的是 —— ${topScore.name}` : '',
     diagnosisTitle: diagnosis[0],
     diagnosisText: diagnosis[1] || '',
     meals: {
@@ -3203,24 +3205,25 @@ async function drawReceiptOverlay(ctx, data, width, height) {
     fitReceiptText(ctx, data.meals[type] || '未選擇', x(4025), y(baseline), x(1080));
   });
 
-  const monsterName = data.scores.find(score => score.id === data.diagnosisMonsterId)?.name || '';
-  ctx.font = `800 ${190 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
-  ctx.textAlign = 'left';
-  const prefix = '今晚你最在意的是 ';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(prefix, x(300), y(6400));
-  ctx.fillStyle = orange;
-  ctx.font = `800 ${300 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
-  fitReceiptText(ctx, monsterName, x(1900), y(6400), x(1800));
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = `800 ${160 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
-  wrapReceiptText(ctx, data.diagnosisTitle, x(300), y(6675), x(3000), 1.12, 2);
+  if (data.hasDiagnosis) {
+    const monsterName = data.scores.find(score => score.id === data.diagnosisMonsterId)?.name || '';
+    ctx.font = `800 ${190 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+    ctx.textAlign = 'left';
+    const prefix = '今晚你最在意的是 ';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(prefix, x(300), y(6400));
+    ctx.fillStyle = orange;
+    ctx.font = `800 ${300 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+    fitReceiptText(ctx, monsterName, x(1900), y(6400), x(1800));
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = `800 ${160 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+    wrapReceiptText(ctx, data.diagnosisTitle, x(300), y(6675), x(3000), 1.12, 2);
 
-  const stampId = data.diagnosisMonsterId || 'O';
-  const stamp = await loadCanvasImage(`素材/小票/${stampId}stamp.png`);
-  ctx.globalAlpha = 0.96;
-  drawReceiptImageContain(ctx, stamp, x(3475), y(6700), x(700), y(700));
-  ctx.globalAlpha = 1;
+    const stamp = await loadCanvasImage(`素材/小票/${data.diagnosisMonsterId}stamp.png`);
+    ctx.globalAlpha = 0.96;
+    drawReceiptImageContain(ctx, stamp, x(3475), y(6700), x(700), y(700));
+    ctx.globalAlpha = 1;
+  }
   ctx.restore();
 }
 
