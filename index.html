@@ -3211,7 +3211,7 @@ async function drawReceiptOverlay(ctx, data, width, height) {
   ctx.fillText(prefix, x(300), y(6400));
   ctx.fillStyle = orange;
   ctx.font = `800 ${300 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
-  fitReceiptText(ctx, monsterName, x(2050), y(6400), x(1650));
+  fitReceiptText(ctx, monsterName, x(1900), y(6400), x(1800));
   ctx.fillStyle = '#FFFFFF';
   ctx.font = `800 ${160 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
   wrapReceiptText(ctx, data.diagnosisTitle, x(300), y(6675), x(3000), 1.12, 2);
