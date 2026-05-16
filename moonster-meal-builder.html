@@ -3035,7 +3035,7 @@ function clearReportRevealTimer() {
 async function updateReceiptPreviewCanvas() {
   const report = document.getElementById('repair-report');
   const preview = document.getElementById('receipt-preview-canvas');
-  const receiptCanvas = await renderReceiptCanvas();
+  const receiptCanvas = await renderReceiptCanvas(isCompactReceiptViewport() ? 1200 : undefined);
   preview.width = receiptCanvas.width;
   preview.height = receiptCanvas.height;
   const ctx = preview.getContext('2d');
@@ -3104,10 +3104,11 @@ async function saveCardNow() {
 
   try {
     populateRepairReport();
+    const receiptMaxWidth = isCompactReceiptViewport() ? 1200 : undefined;
     const cardCanvas = await renderSaveCanvas();
     const cardResult = await downloadCanvas(cardCanvas, 'moonster-card.png');
     await delay(250);
-    const receiptCanvas = await renderReceiptCanvas();
+    const receiptCanvas = await renderReceiptCanvas(receiptMaxWidth);
     const receiptResult = await downloadCanvas(receiptCanvas, 'moonster-receipt.png');
     const messages = {
       picked: saveSuccessMessage,
@@ -3134,19 +3135,32 @@ async function saveCardNow() {
   }
 }
 
-async function renderReceiptCanvas() {
+function isCompactReceiptViewport() {
+  return matchMedia('(max-width:1180px)').matches;
+}
+
+async function renderReceiptCanvas(maxWidth) {
   const data = buildRepairReportData();
-  const base = await loadCanvasImage('素材/小票/receipt_empty.png');
+  const src = maxWidth
+    ? '素材/小票/receipt_mobile.png'
+    : '素材/小票/receipt_empty.png?v=2';
+  const base = await loadCanvasImage(src);
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = base.naturalWidth || base.width;
-  canvas.height = base.naturalHeight || base.height;
+  let w = base.naturalWidth || base.width;
+  let h = base.naturalHeight || base.height;
+  if (maxWidth && w > maxWidth) {
+    h = Math.round(h * maxWidth / w);
+    w = maxWidth;
+  }
+  canvas.width = w;
+  canvas.height = h;
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(base, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(base, 0, 0, w, h);
 
   await document.fonts?.ready;
-  await drawReceiptOverlay(ctx, data, canvas.width, canvas.height);
+  await drawReceiptOverlay(ctx, data, w, h);
   return canvas;
 }
 

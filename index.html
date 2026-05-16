@@ -3142,8 +3142,7 @@ function clearReportRevealTimer() {
 async function updateReceiptPreviewCanvas() {
   const report = document.getElementById('repair-report');
   const preview = document.getElementById('receipt-preview-canvas');
-  const isMobile = matchMedia('(max-width:767px)').matches;
-  const receiptCanvas = await renderReceiptCanvas(isMobile ? 1200 : undefined);
+  const receiptCanvas = await renderReceiptCanvas(isCompactReceiptViewport() ? 1200 : undefined);
   preview.width = receiptCanvas.width;
   preview.height = receiptCanvas.height;
   const ctx = preview.getContext('2d');
@@ -3213,12 +3212,13 @@ async function saveCardNow() {
   try {
     populateRepairReport();
     const isMobileSave = matchMedia('(max-width:767px)').matches;
+    const receiptMaxWidth = isCompactReceiptViewport() ? 1200 : undefined;
     let cardResult = null;
     let receiptResult = null;
 
     if (isMobileSave) {
       const cardCanvas = await renderSaveCanvas();
-      const receiptCanvas = await renderReceiptCanvas(1200);
+      const receiptCanvas = await renderReceiptCanvas(receiptMaxWidth);
       receiptResult = await downloadCanvasFiles([
         { canvas: cardCanvas, filename: 'moonster-card.png' },
         { canvas: receiptCanvas, filename: 'moonster-receipt.png' }
@@ -3227,7 +3227,7 @@ async function saveCardNow() {
       const cardCanvas = await renderSaveCanvas();
       cardResult = await downloadCanvas(cardCanvas, 'moonster-card.png');
       await delay(250);
-      const receiptCanvas = await renderReceiptCanvas();
+      const receiptCanvas = await renderReceiptCanvas(receiptMaxWidth);
       receiptResult = await downloadCanvas(receiptCanvas, 'moonster-receipt.png');
     }
 
@@ -3256,10 +3256,13 @@ async function saveCardNow() {
   }
 }
 
+function isCompactReceiptViewport() {
+  return matchMedia('(max-width:1180px)').matches;
+}
+
 async function renderReceiptCanvas(maxWidth) {
   const data = buildRepairReportData();
-  // On mobile (maxWidth provided), use RGBA PNG to avoid indexed PNG tRNS
-  // transparency issues on Safari iOS. receipt_mobile.png is already 1200×2132.
+  // On compact viewports, use the smaller RGBA PNG to avoid Safari canvas limits.
   const src = maxWidth
     ? '素材/小票/receipt_mobile.png'
     : '素材/小票/receipt_empty.png?v=2';
