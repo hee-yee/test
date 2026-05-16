@@ -957,8 +957,8 @@
     padding:0;
     gap:0;
     background:transparent;
-    box-shadow:0 18px 48px rgba(0,0,0,.32);
-    overflow:hidden;
+    box-shadow:none;
+    overflow:visible;
     max-height:none;
     aspect-ratio:auto;
     height:auto;
@@ -1727,19 +1727,20 @@
       position:relative;
     }
 
-    /* Card overlaid on receipt (absolute, centered, ~18% from top) */
+    /* Card overlaid on receipt (absolute, centered, matching mobile receipt scale) */
     #overlay.save-ready #anim-card.mobile-card-done{
       display:block;
       position:absolute;
       left:50%;
-      top:115px;
-      transform:translateX(-50%);
-      width:250px;
-      height:175px;
+      top:clamp(172px, 48vw, 198px);
+      transform:translateX(-50%) rotate(-8deg);
+      width:272px;
+      height:191px;
       overflow:hidden;
       z-index:5;
       pointer-events:none;
       animation:none;
+      filter:drop-shadow(0 18px 24px rgba(0,0,0,.58)) drop-shadow(0 2px 0 rgba(255,171,48,.28));
     }
 
     #overlay.save-ready #anim-card.mobile-card-done .final-card{
@@ -1748,12 +1749,12 @@
       left:0;
       width:560px;
       height:393px;
-      transform:scale(0.446);
+      transform:scale(0.486);
       transform-origin:top left;
     }
 
     #overlay.save-ready #repair-report{
-      width:min(92vw,380px);
+      width:min(78vw,318px);
       max-height:none;
     }
 
@@ -3204,12 +3205,25 @@ async function saveCardNow() {
 
   try {
     populateRepairReport();
-    const cardCanvas = await renderSaveCanvas();
-    const cardResult = await downloadCanvas(cardCanvas, 'moonster-card.png');
-    await delay(250);
     const isMobileSave = matchMedia('(max-width:767px)').matches;
-    const receiptCanvas = await renderReceiptCanvas(isMobileSave ? 1200 : undefined);
-    const receiptResult = await downloadCanvas(receiptCanvas, 'moonster-receipt.png');
+    let cardResult = null;
+    let receiptResult = null;
+
+    if (isMobileSave) {
+      const cardCanvas = await renderSaveCanvas();
+      const receiptCanvas = await renderReceiptCanvas(1200);
+      receiptResult = await downloadCanvasFiles([
+        { canvas: cardCanvas, filename: 'moonster-card.png' },
+        { canvas: receiptCanvas, filename: 'moonster-receipt.png' }
+      ]);
+    } else {
+      const cardCanvas = await renderSaveCanvas();
+      cardResult = await downloadCanvas(cardCanvas, 'moonster-card.png');
+      await delay(250);
+      const receiptCanvas = await renderReceiptCanvas();
+      receiptResult = await downloadCanvas(receiptCanvas, 'moonster-receipt.png');
+    }
+
     const messages = {
       picked: saveSuccessMessage,
       shared: saveSuccessMessage,
@@ -3462,24 +3476,28 @@ async function renderSaveCanvas() {
 
   await drawCanvasFoods(ctx, cardX, cardY, cardScale);
 
-  const name = getEnteredName();
-  if (name) {
-    const nameX = 560 - nameLabel.right - nameLabel.width / 2;
-    const nameY = 393 - nameLabel.bottom - nameLabel.lineHeight / 2;
-    ctx.save();
-    ctx.translate(cardX + nameX * cardScale, cardY + nameY * cardScale);
-    ctx.rotate(-4 * Math.PI / 180);
-    ctx.fillStyle = '#333';
-    ctx.font = `800 ${nameFontSizeForText(name) * cardScale}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(name, 0, 0);
-    ctx.restore();
-  }
+  drawCanvasName(ctx, cardX, cardY, cardScale);
 
   ctx.drawImage(footer, footerX, footerY, footerW, footerH);
 
   return canvas;
+}
+
+function drawCanvasName(ctx, cardX, cardY, cardScale) {
+  const name = getEnteredName();
+  if (!name) return;
+
+  const nameX = 560 - nameLabel.right - nameLabel.width / 2;
+  const nameY = 393 - nameLabel.bottom - nameLabel.lineHeight / 2;
+  ctx.save();
+  ctx.translate(cardX + nameX * cardScale, cardY + nameY * cardScale);
+  ctx.rotate(-4 * Math.PI / 180);
+  ctx.fillStyle = '#333';
+  ctx.font = `800 ${nameFontSizeForText(name) * cardScale}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(name, 0, 0);
+  ctx.restore();
 }
 
 function showSaveFeedback(message = saveSuccessMessage) {
@@ -3562,6 +3580,49 @@ async function downloadCanvas(canvas, filename) {
   return 'opened';
 }
 
+async function downloadCanvasFiles(items) {
+  const prepared = [];
+  for (const item of items) {
+    const blob = await canvasToBlob(item.canvas);
+    if (!blob) {
+      downloadDataUrl(item.canvas, item.filename);
+      prepared.push(null);
+    } else {
+      prepared.push({
+        blob,
+        filename: item.filename,
+        file: typeof File === 'function' ? new File([blob], item.filename, { type: 'image/png' }) : null
+      });
+    }
+  }
+
+  const files = prepared.map(item => item?.file).filter(Boolean);
+  if (shouldUseNativeShareFiles(files)) {
+    try {
+      await navigator.share({
+        files,
+        title: 'Moonster Meal',
+        text: '我的 Moonster 早餐套餐卡與修復明細'
+      });
+      return 'shared';
+    } catch (err) {
+      if (err && err.name === 'AbortError') throw err;
+    }
+  }
+
+  let result = 'downloaded';
+  for (const item of prepared) {
+    if (!item) continue;
+    if (downloadBlob(item.blob, item.filename)) {
+      await delay(350);
+    } else {
+      openBlobImage(item.blob);
+      result = 'opened';
+    }
+  }
+  return result;
+}
+
 function shouldUseNativeShare(file) {
   const isTouchDevice = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
   return Boolean(
@@ -3569,6 +3630,17 @@ function shouldUseNativeShare(file) {
     file &&
     navigator.canShare &&
     navigator.canShare({ files: [file] }) &&
+    navigator.share
+  );
+}
+
+function shouldUseNativeShareFiles(files) {
+  const isTouchDevice = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+  return Boolean(
+    isTouchDevice &&
+    files.length &&
+    navigator.canShare &&
+    navigator.canShare({ files }) &&
     navigator.share
   );
 }
