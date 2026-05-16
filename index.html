@@ -957,8 +957,8 @@
     padding:0;
     gap:0;
     background:transparent;
-    box-shadow:none;
-    overflow:visible;
+    box-shadow:0 18px 48px rgba(0,0,0,.32);
+    overflow:hidden;
     max-height:none;
     aspect-ratio:auto;
     height:auto;
@@ -971,8 +971,7 @@
     width:100%;
     height:auto;
     object-fit:contain;
-    background:transparent;
-    filter:drop-shadow(0 18px 48px rgba(0,0,0,.32));
+    background:#050505;
   }
   #repair-report.receipt-canvas-ready #receipt-preview-canvas{
     display:block;
@@ -1693,6 +1692,58 @@
     #overlay-close{
       padding:8px 14px;
       font-size:13px;
+    }
+
+    @keyframes popOutMobileExit{
+      0%{transform:scale(.58) rotate(0deg);}
+      100%{transform:scale(0) rotate(5deg);}
+    }
+
+    #anim-card.mobile-card-exit{
+      animation:popOutMobileExit .6s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+
+    #overlay.save-ready{
+      justify-content:flex-start;
+      padding-top:16px;
+      padding-bottom:72px;
+    }
+
+    #overlay.save-ready #report-capture{
+      padding:0;
+      margin-bottom:0;
+    }
+
+    #overlay.save-ready #anim-card{
+      display:none;
+    }
+
+    #overlay.save-ready #repair-report{
+      max-height:calc(100dvh - 88px);
+      width:min(88vw,340px);
+    }
+
+    #overlay.save-ready #overlay-hint{
+      display:none;
+    }
+
+    #overlay.save-ready #overlay-actions{
+      position:fixed;
+      bottom:0;
+      left:0;
+      right:0;
+      margin-top:0;
+      padding:12px 16px;
+      justify-content:center;
+      background:rgba(0,0,0,.18);
+      gap:12px;
+    }
+
+    #overlay.save-ready #overlay-save,
+    #overlay.save-ready #overlay-close{
+      flex:1;
+      max-width:148px;
+      text-align:center;
     }
   }
 
@@ -2422,6 +2473,7 @@ const preloadAssets = [
 let uploadedBgObjectUrl = null;
 let isSavedCurrentDesign = false;
 let reportRevealTimer = null;
+let mobileCardExitPending = false;
 preloadAssets.forEach(preloadImage);
 updateResponsiveScale();
 window.addEventListener('resize', updateResponsiveScale);
@@ -2875,9 +2927,8 @@ function buildRepairReportData() {
   });
   const repaired = scores.reduce((total, item) => total + item.points, 0);
   const topScore = scores.reduce((top, item) => item.points > top.points ? item : top, scores[0]);
-  const hasDiagnosis = repaired > 0;
-  const repairRate = hasDiagnosis ? Math.min(100, Math.round(80 + topScore.points / 100 * 20)) : 0;
-  const diagnosis = hasDiagnosis ? randomItem(topScore.diagnosis) : ['', ''];
+  const repairRate = Math.min(100, Math.round(80 + topScore.points / 100 * 20));
+  const diagnosis = randomItem(topScore.diagnosis);
 
   return {
     guest: getEnteredName() || 'NAME',
@@ -2892,9 +2943,8 @@ function buildRepairReportData() {
     remaining: 400 - repaired,
     overallStatus: repairRate === 100 ? '已結帳・修復完成' : '已結帳・修復中',
     stamp: stampLabel(scores),
-    hasDiagnosis,
-    diagnosisMonsterId: hasDiagnosis ? topScore.id : '',
-    diagnosisMonster: hasDiagnosis ? `今晚你最在意的是 —— ${topScore.name}` : '',
+    diagnosisMonsterId: topScore.id,
+    diagnosisMonster: `今晚你最在意的是 —— ${topScore.name}`,
     diagnosisTitle: diagnosis[0],
     diagnosisText: diagnosis[1] || '',
     meals: {
@@ -3000,7 +3050,21 @@ document.getElementById('complete-btn').addEventListener('click', async () => {
 
 function scheduleReceiptReveal() {
   clearReportRevealTimer();
-  reportRevealTimer = setTimeout(showReceiptReport, 1000);
+  if (matchMedia('(max-width:767px)').matches) {
+    reportRevealTimer = setTimeout(() => {
+      reportRevealTimer = null;
+      mobileCardExitPending = true;
+      const animCard = document.getElementById('anim-card');
+      animCard.classList.add('mobile-card-exit');
+      animCard.addEventListener('animationend', () => {
+        if (!mobileCardExitPending) return;
+        mobileCardExitPending = false;
+        showReceiptReport();
+      }, { once: true });
+    }, 1000);
+  } else {
+    reportRevealTimer = setTimeout(showReceiptReport, 1000);
+  }
 }
 
 function showReceiptReport() {
@@ -3023,6 +3087,9 @@ function showSaveButtonAfterReceipt(event) {
 }
 
 function clearReportRevealTimer() {
+  mobileCardExitPending = false;
+  const animCard = document.getElementById('anim-card');
+  if (animCard) animCard.classList.remove('mobile-card-exit');
   if (!reportRevealTimer) return;
   clearTimeout(reportRevealTimer);
   reportRevealTimer = null;
@@ -3193,11 +3260,11 @@ async function drawReceiptOverlay(ctx, data, width, height) {
   });
 
   const mealRows = [
-    ['main', 4825],
-    ['veg', 5025],
-    ['fruit', 5225],
-    ['dessert', 5425],
-    ['drink', 5625]
+    ['main', 4785],
+    ['veg', 4985],
+    ['fruit', 5185],
+    ['dessert', 5385],
+    ['drink', 5585]
   ];
   ctx.font = `400 ${108 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
   ctx.textAlign = 'right';
@@ -3205,25 +3272,24 @@ async function drawReceiptOverlay(ctx, data, width, height) {
     fitReceiptText(ctx, data.meals[type] || '未選擇', x(4025), y(baseline), x(1080));
   });
 
-  if (data.hasDiagnosis) {
-    const monsterName = data.scores.find(score => score.id === data.diagnosisMonsterId)?.name || '';
-    ctx.font = `800 ${190 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
-    ctx.textAlign = 'left';
-    const prefix = '今晚你最在意的是 ';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(prefix, x(300), y(6400));
-    ctx.fillStyle = orange;
-    ctx.font = `800 ${300 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
-    fitReceiptText(ctx, monsterName, x(1900), y(6400), x(1800));
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = `800 ${160 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
-    wrapReceiptText(ctx, data.diagnosisTitle, x(300), y(6675), x(3000), 1.12, 2);
+  const monsterName = data.scores.find(score => score.id === data.diagnosisMonsterId)?.name || '';
+  ctx.font = `800 ${190 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  ctx.textAlign = 'left';
+  const prefix = '今晚你最在意的是 ';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(prefix, x(300), y(6400));
+  ctx.fillStyle = orange;
+  ctx.font = `800 ${300 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  fitReceiptText(ctx, monsterName, x(2050), y(6400), x(1650));
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `800 ${160 * s}px "LINE Seed TW", "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  wrapReceiptText(ctx, data.diagnosisTitle, x(300), y(6675), x(3000), 1.12, 2);
 
-    const stamp = await loadCanvasImage(`素材/小票/${data.diagnosisMonsterId}stamp.png`);
-    ctx.globalAlpha = 0.96;
-    drawReceiptImageContain(ctx, stamp, x(3475), y(6700), x(700), y(700));
-    ctx.globalAlpha = 1;
-  }
+  const stampId = data.diagnosisMonsterId || 'O';
+  const stamp = await loadCanvasImage(`素材/小票/${stampId}stamp.png`);
+  ctx.globalAlpha = 0.96;
+  drawReceiptImageContain(ctx, stamp, x(3475), y(6700), x(700), y(700));
+  ctx.globalAlpha = 1;
   ctx.restore();
 }
 
